@@ -1,3 +1,4 @@
 # Othello
 CSC 242 final project
-By Anis, John, Nathan
+By Anis Kallel, John Donner, Nathan Contino
+aka Team Daybreak
