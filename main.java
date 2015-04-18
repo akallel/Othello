@@ -201,13 +201,6 @@ public class main {
 				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
 			System.out.print(i + " |");
 			for (int j = 0; j < board.length; j++) {
-<<<<<<< Updated upstream
-				if (board[i][j] == 1)
-					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
-				else if (board[i][j] == 2)
-					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
-				else
-=======
 				if (board[i][j] == 1){
 					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
 				}
@@ -215,7 +208,6 @@ public class main {
 					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
 				}
 				else{
->>>>>>> Stashed changes
 					System.out.print(board[i][j] + " ");
 				}
 			}
