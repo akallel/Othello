@@ -76,7 +76,7 @@ public class main {
 					noMoves = false;
 					refreshMoveValues();
 					shittyHeuristic();
-					// printMoveValues();
+					printMoveValues();
 					int[] n = bestMove(nodes);
 					System.out.println("Computer moves to: (" + n[0] + ","
 							+ n[1] + ")");
@@ -202,9 +202,9 @@ public class main {
 			System.out.print(i + " |");
 			for (int j = 0; j < board.length; j++) {
 				if (board[i][j] == 1)
-					System.out.print(board[i][j] + " ");
+					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
 				else if (board[i][j] == 2)
-					System.out.print(board[i][j] + " ");
+					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
 				else
 					System.out.print(board[i][j] + " ");
 			}
