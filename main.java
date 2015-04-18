@@ -19,7 +19,7 @@ public class main {
 		initializeTable(board);
 		printTable();
 
-		while (notFull() || gameOver) { // not the only stopping condition,
+		while (!gameOver) { // not the only stopping condition,
 										// other cases
 			// where all are 1s or 2s should be included
 			int n1 = 0, n2 = 0;
@@ -201,26 +201,26 @@ public class main {
 				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
 			System.out.print(i + " |");
 			for (int j = 0; j < board.length; j++) {
+<<<<<<< Updated upstream
 				if (board[i][j] == 1)
 					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
 				else if (board[i][j] == 2)
 					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
 				else
+=======
+				if (board[i][j] == 1){
+					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
+				}
+				else if (board[i][j] == 2){
+					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
+				}
+				else{
+>>>>>>> Stashed changes
 					System.out.print(board[i][j] + " ");
+				}
 			}
 			System.out.println();
 		}
-	}
-	
-	/* notFull - a useless method that checks if every tile is occupied
-	 * 
-	 */
-	private static boolean notFull() {
-		for (int i = 0; i < board.length; i++)
-			for (int j = 0; j < board[0].length; j++)
-				if (board[i][j] == 0)
-					return true;
-		return false;
 	}
 
 	/* initializeTable - creates the initial playing board
