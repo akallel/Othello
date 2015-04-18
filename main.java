@@ -11,82 +11,105 @@ public class main {
 	static int[][] board = new int[8][8];
 	static int[][] moveValues = new int[8][8];
 	static int turn = 0, TRUE = 1, FALSE = 0;
+	static boolean noMoves = false;
+	static boolean gameOver = false;
 
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
 		printTable();
 
-		while (notFull()) { // not the only stopping condition, other cases
-							// where all are 1s or 2s should be included
+		while (notFull() || gameOver) { // not the only stopping condition,
+										// other cases
+			// where all are 1s or 2s should be included
 			int n1 = 0, n2 = 0;
 
 			if (turn % 2 == 0) {
 				// player 1 moves
 				ArrayList<Node> nodes = allNextMoves();
-				
-				//prints out the valid moves for the non-computer player. 
-				//continues to prompt for a move until a valid move is supplied.
-				do {
-					System.out.println("Your options for player "
-							+ (turn % 2 + 1) + " are: " + nodes.toString());
-					System.out.println("choose coordinates a,b");
-					String a = scan.next();
-					String[] aa = a.split(",");
-					n2 = Integer.parseInt(aa[0]);
-					n1 = Integer.parseInt(aa[1]);
-				} while (!validMove(n1, n2, nodes));
-				
-				//once we've determined that the player has selected a valid move
-				//we change the tile
-				board[n1][n2] = 1;
-				
-				//flip the resulting changed tiles
-				doFlip(turn, n1, n2);
-				
-				//increment the turn
-				turn++;
-				
-				//and print out the board state for the next player.
-				printTable();
+				if (nodes.isEmpty()) {
+					System.out.println("NO MOVES AVAILABLE FOR USER.");
+					turn++;
+					if(noMoves == true)
+						gameOver = true;
+					noMoves = true;
+				} else {
+					noMoves = false;
+					// prints out the valid moves for the non-computer player.
+					// continues to prompt for a move until a valid move is
+					// supplied.
+					do {
+						System.out.println("Your options for player "
+								+ (turn % 2 + 1) + " are: " + nodes.toString());
+						System.out.println("choose coordinates a,b");
+						String a = scan.next();
+						String[] aa = a.split(",");
+						n2 = Integer.parseInt(aa[0]);
+						n1 = Integer.parseInt(aa[1]);
+					} while (!validMove(n1, n2, nodes));
+
+					// once we've determined that the player has selected a
+					// valid move
+					// we change the tile
+					board[n1][n2] = 1;
+
+					// flip the resulting changed tiles
+					doFlip(turn, n1, n2);
+
+					// increment the turn
+					turn++;
+
+					// and print out the board state for the next player.
+					printTable();
+				}
 			} else {
 				// player 2 moves
 				ArrayList<Node> nodes = allNextMoves();
-				//printTable();
-				refreshMoveValues();
-				shittyHeuristic();
-				//printMoveValues();
-				int[] n = bestMove(nodes);
-				System.out.println("Computer moves to: (" + n[0] + "," + n[1] + ")");
-				board[n[0]][n[1]] = 2;
-				doFlip(turn, n[0], n[1]);
-				turn++;
-				printTable();
+				// printTable();
+				if (nodes.isEmpty()) {
+					System.out.println("NO MOVES AVAILABLE FOR COMPUTER.");
+					turn++;
+					if(noMoves == true)
+						gameOver = true;
+					noMoves = true;
+				} else {
+					noMoves = false;
+					refreshMoveValues();
+					shittyHeuristic();
+					// printMoveValues();
+					int[] n = bestMove(nodes);
+					System.out.println("Computer moves to: (" + n[0] + ","
+							+ n[1] + ")");
+					board[n[0]][n[1]] = 2;
+					doFlip(turn, n[0], n[1]);
+					turn++;
+					printTable();
+				}
 			}
 		}
-		if (!notFull()) {
-			// count who won if the board is full
-			if (howMany(1) > howMany(2))
-				System.out.println("Player 1 wins");
-			else if (howMany(1) < howMany(2))
-				System.out.println("Player 2 wins");
-			else
-				System.out.println("Draw game");
-		}
+
+		// count who won if the board is full
+		if (howMany(1) > howMany(2))
+			System.out.println("Player 1 wins");
+		else if (howMany(1) < howMany(2))
+			System.out.println("Player 2 wins");
+		else
+			System.out.println("Draw game");
 	}
-	
+
 	private static int[] bestMove(ArrayList<Node> possMoves) {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y;
 		int val = moveValues[y][x];
+
 		for (int i = 1; i < possMoves.size(); i++) {
-			if(val < moveValues[possMoves.get(i).Y][possMoves.get(i).X]){
-				 val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
-			x = possMoves.get(i).X;
-			y = possMoves.get(i).Y;
+			if (val < moveValues[possMoves.get(i).Y][possMoves.get(i).X]) {
+				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
+				x = possMoves.get(i).X;
+				y = possMoves.get(i).Y;
 			}
 		}
-		int[] n = {x, y};
+		int[] n = { x, y };
 		return n;
 	}
 
@@ -106,7 +129,7 @@ public class main {
 					answer++;
 			}
 		}
-		return a;
+		return answer;
 	}
 
 	// doFlip flips all pieces that were effected by a move
@@ -194,54 +217,63 @@ public class main {
 
 	}
 
-	/* CanFlip - moves out in a given direction from an empty tile to identify if that tile represents a valid move
-	 * for the team moving on the current turn. dirX, dirY should be {-1, 0, 1}, but should never BOTH be zero.
+	/*
+	 * CanFlip - moves out in a given direction from an empty tile to identify
+	 * if that tile represents a valid move for the team moving on the current
+	 * turn. dirX, dirY should be {-1, 0, 1}, but should never BOTH be zero.
 	 */
 	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
 		// define who attacking and defending players are based on turn
-     	if (turn % 2 ==0) {
-     		player = 1;
-     		oppositePlayer = 2;
-     	} else {
-     		player = 2;
-     		oppositePlayer = 1;
-     	}
-     	
-      boolean capture = false;
-    	while (X+dirX < 8 && X+dirX >= 0 && Y+dirY < 8 && Y+dirY >= 0 && board[X+dirX][Y+dirY]==oppositePlayer) {
-    		
-        	X = X+dirX; Y = Y+dirY;
-        	capture = true;
-    	}
-    	if (capture == false) return false;
-    	
-    	if (X+dirX < 8 && X+dirX >= 0 && Y+dirY < 8 && Y+dirY >= 0 && board[X+dirX][Y+dirY]== player)
-        	return true;
-    	
-    	else return false;
-	}
-	
+		if (turn % 2 == 0) {
+			player = 1;
+			oppositePlayer = 2;
+		} else {
+			player = 2;
+			oppositePlayer = 1;
+		}
 
-	/* Legal - checks forward/backward/diagonal in all directions for opposing color tiles
-	 * using -1, 0, and 1 as possible directions to check. Calls CanFlip.
-	 * NOTE: this probably doesn't actually work. 
+		boolean capture = false;
+		while (X + dirX < 8 && X + dirX >= 0 && Y + dirY < 8 && Y + dirY >= 0
+				&& board[X + dirX][Y + dirY] == oppositePlayer) {
+
+			X = X + dirX;
+			Y = Y + dirY;
+			capture = true;
+		}
+		if (capture == false)
+			return false;
+
+		if (X + dirX < 8 && X + dirX >= 0 && Y + dirY < 8 && Y + dirY >= 0
+				&& board[X + dirX][Y + dirY] == player)
+			return true;
+
+		else
+			return false;
+	}
+
+	/*
+	 * Legal - checks forward/backward/diagonal in all directions for opposing
+	 * color tiles using -1, 0, and 1 as possible directions to check. Calls
+	 * CanFlip. NOTE: this probably doesn't actually work.
 	 */
 	public static boolean Legal(int X, int Y) {
 		int i, j, captures;
 		captures = 0;
 		if (board[X][Y] != 0)
 			return false;
-		// method to explore up/down/left/right/upright/upleft/downright/downleft directions
+		// method to explore
+		// up/down/left/right/upright/upleft/downright/downleft directions
 		for (i = -1; i <= 1; i++)
 			for (j = -1; j <= 1; j++)
 				if ((i != 0 || j != 0) && CanFlip(X, Y, i, j))
 					return true;
 		return false;
 	}
-	
-	/* allNextMoves - traverses the entire array. Calls Legal on each to generate valid move spaces.
-	 * 
+
+	/*
+	 * allNextMoves - traverses the entire array. Calls Legal on each to
+	 * generate valid move spaces.
 	 */
 	public static ArrayList<Node> allNextMoves() {
 		ArrayList<Node> nextMoves = new ArrayList<Node>();
@@ -253,30 +285,30 @@ public class main {
 				}
 		return nextMoves;
 	}
-	
-	public static void shittyHeuristic(){
-		for(int i = 0; i < moveValues.length; i++){
-			for(int j = 0; j < moveValues[i].length; j++){
-				if(i < 4)
+
+	public static void shittyHeuristic() {
+		for (int i = 0; i < moveValues.length; i++) {
+			for (int j = 0; j < moveValues[i].length; j++) {
+				if (i < 4)
 					moveValues[i][j] += 4 - i;
-				if(i >= 4)
+				if (i >= 4)
 					moveValues[i][j] += i % 4;
-				if(j < 4)
+				if (j < 4)
 					moveValues[i][j] += 4 - j;
-				if(j >= 4)
+				if (j >= 4)
 					moveValues[i][j] += j % 4;
 			}
 		}
 	}
-	
-	public static void refreshMoveValues(){
-		for(int i = 0; i < moveValues.length; i++){
-			for(int j = 0; j < moveValues[i].length; j++){
+
+	public static void refreshMoveValues() {
+		for (int i = 0; i < moveValues.length; i++) {
+			for (int j = 0; j < moveValues[i].length; j++) {
 				moveValues[i][j] = 0;
 			}
 		}
 	}
-	
+
 	private static void printMoveValues() {
 		for (int i = 0; i < moveValues.length; i++) {
 			if (i == 0)
