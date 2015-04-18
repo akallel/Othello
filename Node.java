@@ -5,4 +5,8 @@ public class Node{
 			this.X=X;
 			this.Y=Y;
 		}
+		
+		public String toString(){
+			return "(" + Y + "," + X + ")";
+		}
 	}
