@@ -6,6 +6,6 @@ public class Node{
 		this.Y=Y;
 	}
 	public String toString(){
-		return "("+ X + "," + Y + ")";
+		return "("+ Y + "," + X + ")";
 	}	
 }
