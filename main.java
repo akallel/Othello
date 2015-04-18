@@ -10,7 +10,7 @@ public class main {
 	public static final String ANSI_GREEN = "\u001B[32m";
 	static int[][] board = new int[8][8];
 	static int[][] moveValues = new int[8][8];
-	static int turn = 0, TRUE = 1, FALSE = 0;
+	static int turn = 0;
 	static boolean noMoves = false;
 	static boolean gameOver = false;
 
@@ -18,7 +18,7 @@ public class main {
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
 		printTable();
-
+		
 		while (!gameOver) { // not the only stopping condition,
 										// other cases
 			// where all are 1s or 2s should be included
@@ -198,8 +198,8 @@ public class main {
 	private static void printTable() {
 		for (int i = 0; i < board.length; i++) {
 			if (i == 0)
-				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
-			System.out.print(i + " |");
+				System.out.println("    0 1 2 3 4 5 6 7\n   ----------------");
+			System.out.print(i + " | ");
 			for (int j = 0; j < board.length; j++) {
 				if (board[i][j] == 1){
 					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
@@ -304,18 +304,15 @@ public class main {
 	 * 
 	 */
 	public static void shittyHeuristic() {
-		for (int i = 0; i < moveValues.length; i++) {
-			for (int j = 0; j < moveValues[i].length; j++) {
-				if (i < 4)
-					moveValues[i][j] += 4 - i;
-				if (i >= 4)
-					moveValues[i][j] += i % 4;
-				if (j < 4)
-					moveValues[i][j] += 4 - j;
-				if (j >= 4)
-					moveValues[i][j] += j % 4;
-			}
-		}
+		int[][] shit = {{20, -3, 11, 8, 8, 11, -3, 20},
+				{-3, -7, -4, 1, 1, -4, -7, -3},
+				{11, -4, 2, 2, 2, 2, -4, 11},
+				{8, 1, 2, -3, -3, 2, 1, 8},
+				{8, 1, 2, -3, -3, 2, 1, 8},
+				{11, -4, 2, 2, 2, 2, -4, 11},
+				{-3, -7, -4, 1, 1, -4, -7, -3},
+				{20, -3, 11, 8, 8, 11, -3, 20}};
+		moveValues = shit;
 	}
 
 	/* refreshMoveValues - refreshes every position in the parallel moveValues array to zero
@@ -336,7 +333,7 @@ public class main {
 		for (int i = 0; i < moveValues.length; i++) {
 			if (i == 0)
 				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
-			System.out.print(i + " |");
+			System.out.print(i + " | ");
 			for (int j = 0; j < moveValues.length; j++) {
 				if (moveValues[i][j] == 1)
 					System.out.print(moveValues[i][j] + " ");
