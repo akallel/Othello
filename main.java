@@ -97,6 +97,9 @@ public class main {
 			System.out.println("Draw game");
 	}
 
+	/* bestMove - traverses the 2D array, recording the coordinates of the best valued position
+	 * 
+	 */
 	private static int[] bestMove(ArrayList<Node> possMoves) {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y;
@@ -112,7 +115,10 @@ public class main {
 		int[] n = { x, y };
 		return n;
 	}
-
+	
+	/* validMove - identifies if a provided (x,y) coordinate is a valid position to place a tile
+	 * 
+	 */
 	private static boolean validMove(int x, int y, ArrayList<Node> possMoves) {
 		for (int i = 0; i < possMoves.size(); i++) {
 			if (possMoves.get(i).X == x && possMoves.get(i).Y == y)
@@ -120,7 +126,10 @@ public class main {
 		}
 		return false;
 	}
-
+	
+	/* howMany - what the fuck is wrong with Anis
+	 * 
+	 */
 	private static int howMany(int a) {
 		int answer = 0;
 		for (int i = 0; i < board.length; i++) {
@@ -132,7 +141,9 @@ public class main {
 		return answer;
 	}
 
-	// doFlip flips all pieces that were effected by a move
+	/* doFlip - flips all pieces that were effected by a move
+	 * 
+	 */
 	private static void doFlip(int turn, int newx, int newy) {
 		flipCheck(turn, newx, newy, -1, 0); // Checks west
 		flipCheck(turn, newx, newy, -1, 1); // Checks north-west
@@ -144,8 +155,8 @@ public class main {
 		flipCheck(turn, newx, newy, -1, -1); // Checks south
 	}
 
-	// flipCheck recursively checks a straight path in a direction to flip the
-	// pieces
+	/* flipCheck - actually flips the tiles in a specific direction
+	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry) {
 		int player, oppositePlayer;
@@ -180,6 +191,10 @@ public class main {
 		return false;
 	}
 
+	/* printTable - not sure why we have specific methods to print two identically-sized
+	 * 2D arrays... but oh well. "Memory is cheap" - Ted
+	 * 
+	 */
 	private static void printTable() {
 		for (int i = 0; i < board.length; i++) {
 			if (i == 0)
@@ -196,7 +211,10 @@ public class main {
 			System.out.println();
 		}
 	}
-
+	
+	/* notFull - a useless method that checks if every tile is occupied
+	 * 
+	 */
 	private static boolean notFull() {
 		for (int i = 0; i < board.length; i++)
 			for (int j = 0; j < board[0].length; j++)
@@ -205,6 +223,9 @@ public class main {
 		return false;
 	}
 
+	/* initializeTable - creates the initial playing board
+	 * 
+	 */
 	public static void initializeTable(int[][] a) {
 		for (int i = 0; i < a.length; i++)
 			for (int j = 0; j < a[0].length; j++)
@@ -286,6 +307,10 @@ public class main {
 		return nextMoves;
 	}
 
+	/* shittyHeuristic - a rough, initial heuristic that simply
+	 * prioritizes corners > edges > inner rings
+	 * 
+	 */
 	public static void shittyHeuristic() {
 		for (int i = 0; i < moveValues.length; i++) {
 			for (int j = 0; j < moveValues[i].length; j++) {
@@ -301,6 +326,9 @@ public class main {
 		}
 	}
 
+	/* refreshMoveValues - refreshes every position in the parallel moveValues array to zero
+	 * 
+	 */
 	public static void refreshMoveValues() {
 		for (int i = 0; i < moveValues.length; i++) {
 			for (int j = 0; j < moveValues[i].length; j++) {
@@ -309,6 +337,9 @@ public class main {
 		}
 	}
 
+	/* printMoveValues - prints out the 2D array of move values
+	 * 
+	 */
 	private static void printMoveValues() {
 		for (int i = 0; i < moveValues.length; i++) {
 			if (i == 0)

@@ -6,4 +6,4 @@ By Anis Kallel, John Donner, Nathan Contino
 
 aka Team Daybreak
 
-codeshare sucks
+shitty heuristic - corner > edge > inside > more inside
