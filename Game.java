@@ -24,15 +24,9 @@ public class Game {
 	}
 	
 	public static int play(){
-		while (!gameOver) { // not the only stopping condition,
-			// other cases
-			// where all are 1s or 2s should be included
-			int n1 = 0, n2 = 0;
-
+		while (!gameOver) {
 			if (turn % 2 == 0) {
-				// player 2 moves
 				ArrayList<Node> nodes = allNextMoves();
-				// printTable();
 				if (nodes.isEmpty()) {
 					turn++;
 					if (noMoves == true)
@@ -42,8 +36,6 @@ public class Game {
 					noMoves = false;
 					// printMoveValues();
 					int[] n = bestMove(nodes);
-					System.out.println("Computer moves to: (" + n[0] + ","
-							+ n[1] + ")");
 					board[n[0]][n[1]] = 2;
 					doFlip(turn, n[0], n[1]);
 					turn++;
@@ -61,8 +53,6 @@ public class Game {
 					noMoves = false;
 					// printMoveValues();
 					int[] n = bestMove(nodes);
-					System.out.println("Computer moves to: (" + n[0] + ","
-							+ n[1] + ")");
 					board[n[0]][n[1]] = 2;
 					doFlip(turn, n[0], n[1]);
 					turn++;
