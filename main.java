@@ -9,15 +9,7 @@ public class main {
 	public static final String ANSI_RED = "\u001B[31m";
 	public static final String ANSI_GREEN = "\u001B[32m";
 	static int[][] board = new int[8][8];
-	//static int[][] moveValues = new int[8][8];
-	static int[][] moveValues = {{20, -3, 11, 8, 8, 11, -3, 20},
-        {-3, -7, -4, 1, 1, -4, -7, -3},
-        {11, -4, 2, 2, 2, 2, -4, 11},
-        {8, 1, 2, -3, -3, 2, 1, 8},
-        {8, 1, 2, -3, -3, 2, 1, 8},
-        {11, -4, 2, 2, 2, 2, -4, 11},
-        {-3, -7, -4, 1, 1, -4, -7, -3},
-        {20, -3, 11, 8, 8, 11, -3, 20}};
+	static int[][] moveValues = new int[8][8];
 	static int turn = 0, TRUE = 1, FALSE = 0;
 	static boolean noMoves = false;
 	static boolean gameOver = false;
@@ -82,9 +74,9 @@ public class main {
 					noMoves = true;
 				} else {
 					noMoves = false;
-					// refreshMoveValues();
-					//shittyHeuristic();
-					printMoveValues();
+					refreshMoveValues();
+					shittyHeuristic();
+					//printMoveValues();
 					int[] n = bestMove(nodes);
 					System.out.println("Computer moves to: (" + n[0] + ","
 							+ n[1] + ")");
