@@ -57,6 +57,7 @@ public class main {
 				shittyHeuristic();
 				//printMoveValues();
 				int[] n = bestMove(nodes);
+				System.out.println("Computer moves to: (" + n[0] + "," + n[1] + ")");
 				board[n[0]][n[1]] = 2;
 				doFlip(turn, n[0], n[1]);
 				turn++;
