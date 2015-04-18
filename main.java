@@ -9,6 +9,7 @@ public class main {
 	public static final String ANSI_RED = "\u001B[31m";
 	public static final String ANSI_GREEN = "\u001B[32m";
 	static int[][] board = new int[8][8];
+	static int[][] moveValues = new int[8][8];
 	static int turn = 0, TRUE = 1, FALSE = 0;
 
 	public static void main(String[] args) {
@@ -51,20 +52,13 @@ public class main {
 			} else {
 				// player 2 moves
 				ArrayList<Node> nodes = allNextMoves();
-				// algorithms for computer moves should go here
-
-				// currently, we'll just let player 2 pick from anything; eventually AI will be implemented
-				System.out.println("Your options for player " + (turn % 2 + 1)
-						+ " are: " + nodes.toString());
-				System.out.println("choose coordinates a,b");
-				String a = scan.next();
-				String[] aa = a.split(",");
-				n2 = Integer.parseInt(aa[0]);
-				n1 = Integer.parseInt(aa[1]);
-
-				
-				board[n1][n2] = 2;
-				doFlip(turn, n1, n2);
+				//printTable();
+				refreshMoveValues();
+				shittyHeuristic();
+				//printMoveValues();
+				int[] n = bestMove(nodes);
+				board[n[0]][n[1]] = 2;
+				doFlip(turn, n[0], n[1]);
 				turn++;
 				printTable();
 			}
@@ -78,6 +72,21 @@ public class main {
 			else
 				System.out.println("Draw game");
 		}
+	}
+	
+	private static int[] bestMove(ArrayList<Node> possMoves) {
+		int x = possMoves.get(0).X;
+		int y = possMoves.get(0).Y;
+		int val = moveValues[y][x];
+		for (int i = 1; i < possMoves.size(); i++) {
+			if(val < moveValues[possMoves.get(i).Y][possMoves.get(i).X]){
+				 val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
+			x = possMoves.get(i).X;
+			y = possMoves.get(i).Y;
+			}
+		}
+		int[] n = {x, y};
+		return n;
 	}
 
 	private static boolean validMove(int x, int y, ArrayList<Node> possMoves) {
@@ -184,42 +193,34 @@ public class main {
 
 	}
 
+	/* CanFlip - moves out in a given direction from an empty tile to identify if that tile represents a valid move
+	 * for the team moving on the current turn. dirX, dirY should be {-1, 0, 1}, but should never BOTH be zero.
+	 */
 	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
-		} else {
-			player = 2;
-			oppositePlayer = 1;
-		}
-		
-		//we need to weed out examples of empty tiles immediately adjacent to occupied-by-player tiles.
-		if(X + dirX < 8 && X + dirX >= 0 && Y + dirY < 8 && Y + dirY >= 0)
-			if((dirX == 1 && dirY == 1 ) || (dirX == -1 && dirY == -1) && 
-					(board[X + dirX][Y + dirY] == player || board[X + dirX][Y + dirY] == 0))
-				return false;
-		
-		//checks for conflicts with the edges (top/bottom/left/right)
-		while (X + dirX < 8 && X + dirX >= 0 && Y + dirY < 8 && Y + dirY >= 0) {
-
-			//increments/decrements the X and Y coordinates, rather than the "direction" element to maintain direction.
-			//if the next tile in our direction is the opposite player, we want to keep checking (increment in direction)
-			if(board[X + dirX][Y + dirY] == oppositePlayer){
-				X = X + dirX;
-				Y = Y + dirY;
-			}
-			//if we come to an empty tile, we know that we can't move in that direction
-			else if(board[X + dirX][Y + dirY] == 0)
-				return false;
-			//the only time when the move is valid is when we hit a tile of our own denomination
-			//after exploring >= 1 tile of the opposing denomination. in this case, we can capture the empty tile
-			else if(board[X + dirX][Y + dirY] == player)
-				return true;
-		}
-		return false;
+     	if (turn % 2 ==0) {
+     		player = 1;
+     		oppositePlayer = 2;
+     	} else {
+     		player = 2;
+     		oppositePlayer = 1;
+     	}
+     	
+      boolean capture = false;
+    	while (X+dirX < 8 && X+dirX >= 0 && Y+dirY < 8 && Y+dirY >= 0 && board[X+dirX][Y+dirY]==oppositePlayer) {
+    		
+        	X = X+dirX; Y = Y+dirY;
+        	capture = true;
+    	}
+    	if (capture == false) return false;
+    	
+    	if (X+dirX < 8 && X+dirX >= 0 && Y+dirY < 8 && Y+dirY >= 0 && board[X+dirX][Y+dirY]== player)
+        	return true;
+    	
+    	else return false;
 	}
+	
 
 	/* Legal - checks forward/backward/diagonal in all directions for opposing color tiles
 	 * using -1, 0, and 1 as possible directions to check. Calls CanFlip.
@@ -233,7 +234,7 @@ public class main {
 		// method to explore up/down/left/right/upright/upleft/downright/downleft directions
 		for (i = -1; i <= 1; i++)
 			for (j = -1; j <= 1; j++)
-				if ((i != 0 && j != 0) && CanFlip(X, Y, i, j))
+				if ((i != 0 || j != 0) && CanFlip(X, Y, i, j))
 					return true;
 		return false;
 	}
@@ -250,5 +251,45 @@ public class main {
 					nextMoves.add(newNode);
 				}
 		return nextMoves;
+	}
+	
+	public static void shittyHeuristic(){
+		for(int i = 0; i < moveValues.length; i++){
+			for(int j = 0; j < moveValues[i].length; j++){
+				if(i < 4)
+					moveValues[i][j] += 4 - i;
+				if(i >= 4)
+					moveValues[i][j] += i % 4;
+				if(j < 4)
+					moveValues[i][j] += 4 - j;
+				if(j >= 4)
+					moveValues[i][j] += j % 4;
+			}
+		}
+	}
+	
+	public static void refreshMoveValues(){
+		for(int i = 0; i < moveValues.length; i++){
+			for(int j = 0; j < moveValues[i].length; j++){
+				moveValues[i][j] = 0;
+			}
+		}
+	}
+	
+	private static void printMoveValues() {
+		for (int i = 0; i < moveValues.length; i++) {
+			if (i == 0)
+				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
+			System.out.print(i + " |");
+			for (int j = 0; j < moveValues.length; j++) {
+				if (moveValues[i][j] == 1)
+					System.out.print(moveValues[i][j] + " ");
+				else if (moveValues[i][j] == 2)
+					System.out.print(moveValues[i][j] + " ");
+				else
+					System.out.print(moveValues[i][j] + " ");
+			}
+			System.out.println();
+		}
 	}
 }
