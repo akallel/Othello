@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 import java.util.ArrayList;
->>>>>>> 80aa0f18d87d0a0f076b104c2c518e8f4cb29295
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -21,57 +18,9 @@ public class main {
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
 		printTable();
-<<<<<<< HEAD
-	
-	while(notFull()){ // not the only stopping condition, other cases where all are 1s or 2s should be included
-		LinkedList<Node> nodes = allNextMoves();
-		System.out.println("Your options for player "+ (turn%2+1) + " are: " + nodes.toString());
-		System.out.println("choose coordinates a,b");
-		String a = scan.next();
-		String[] aa= a.split(",");
-		int n2 =Integer.parseInt(aa[0]);
-		int n1= Integer.parseInt(aa[1]);
+		
 
-		if(turn%2 == 0){
-			// player 1 moves
-			board[n1][n2]= 1;
-			doFlip(turn, n1, n2);
-			turn++;
-			printTable();
-		}
-		else {
-			// player 2 moves 
-			// algorithms for computer moves should go here
-			board[n1][n2]= 2;	
-			doFlip(turn, n1, n2);
-			turn++;
-			printTable();
-			}
-		}
-	 if(!notFull()){
-	      	// count who won if the board is full
-	        if (howMany(1)>howMany(2)) System.out.println("Player 1 wins");
-	        else if(howMany(1)<howMany(2)) System.out.println("Player 2 wins");
-	        else System.out.println("Draw game");
-	      }
-	}
-  
-	private static int howMany(int a){
-	  	int answer=0;
-	    for(int i=0;i<board.length;i++){
-			for(int j=0;j<board[0].length;j++){
-	           	if (board[i][j] == a)
-	            	answer++;
-	        }
-	    }
-	    return a;
-	  }
-
-  	// doFlip flips all pieces that were effected by a move
-    private static void doFlip(int turn, int newx, int newy) {
-=======
-
-		while (notFull() || gameOver) { // not the only stopping condition,
+		while (!gameOver) { // not the only stopping condition,
 										// other cases
 			// where all are 1s or 2s should be included
 			int n1 = 0, n2 = 0;
@@ -126,10 +75,19 @@ public class main {
 					noMoves = true;
 				} else {
 					noMoves = false;
-					refreshMoveValues();
-					shittyHeuristic();
-					// printMoveValues();
-					int[] n = bestMove(nodes);
+					Game[] leaves = new Game[nodes.size()];
+					for(int i = 0; i < leaves.length; i++){
+						leaves[i] = new Game(move(nodes.get(i)), turn, noMoves, gameOver);
+					}
+					
+					int[] leafResults = new int[leaves.length];
+					for(int i = 0; i < leafResults.length; i++){
+						leafResults[i] = leaves[i].play();
+					}
+					
+					int bestMove = bestMove(leafResults);
+					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
+					
 					System.out.println("Computer moves to: (" + n[0] + ","
 							+ n[1] + ")");
 					board[n[0]][n[1]] = 2;
@@ -148,24 +106,36 @@ public class main {
 		else
 			System.out.println("Draw game");
 	}
+	
+	/* move - creates a new board with a potential computer move
+	 * 
+	 */
+	public static int[][] move(Node n){
+		int[][] newBoard = new int[8][8];
+		for(int i = 0; i < board.length; i++){
+			for(int j = 0; j < board[i].length; j++){
+				newBoard[i][j] = board[i][j];
+			}
+		}
+		
+		newBoard[n.Y][n.X] = 1;
+
+		// flip the resulting changed tiles
+		doFlip(turn, n.Y, n.X, newBoard);
+		return newBoard;
+	}
 
 	/* bestMove - traverses the 2D array, recording the coordinates of the best valued position
 	 * 
 	 */
-	private static int[] bestMove(ArrayList<Node> possMoves) {
-		int x = possMoves.get(0).X;
-		int y = possMoves.get(0).Y;
-		int val = moveValues[y][x];
-
-		for (int i = 1; i < possMoves.size(); i++) {
-			if (val < moveValues[possMoves.get(i).Y][possMoves.get(i).X]) {
-				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
-				x = possMoves.get(i).X;
-				y = possMoves.get(i).Y;
+	private static int bestMove(int[] leafResults) {
+		int index = 0;
+		for(int i = 1; i < leafResults.length; i++){
+			if(leafResults[i] > leafResults[index]){
+				index = i;
 			}
 		}
-		int[] n = { x, y };
-		return n;
+		return index;
 	}
 	
 	/* validMove - identifies if a provided (x,y) coordinate is a valid position to place a tile
@@ -196,72 +166,27 @@ public class main {
 	/* doFlip - flips all pieces that were effected by a move
 	 * 
 	 */
-	private static void doFlip(int turn, int newx, int newy) {
->>>>>>> 80aa0f18d87d0a0f076b104c2c518e8f4cb29295
-		flipCheck(turn, newx, newy, -1, 0); // Checks west
-		flipCheck(turn, newx, newy, -1, 1); // Checks north-west
-		flipCheck(turn, newx, newy, 0, 1); // Checks north
-		flipCheck(turn, newx, newy, 1, 1); // Checks north-east
-<<<<<<< HEAD
-      	flipCheck(turn, newx, newy, 1, 0); // Checks east
-      	flipCheck(turn, newx, newy, 1, -1); // Checks south-east
-      	flipCheck(turn, newx, newy, 0, -1); // Checks south
-      	flipCheck(turn, newx, newy, -1, -1); // Checks south
-    }
-    
-
-    // flipCheck recursively checks a straight path in a direction to flip the pieces
-   private static boolean flipCheck(int turn, int newx, int newy, int dirx, int diry) {
-=======
-		flipCheck(turn, newx, newy, 1, 0); // Checks east
-		flipCheck(turn, newx, newy, 1, -1); // Checks south-east
-		flipCheck(turn, newx, newy, 0, -1); // Checks south
-		flipCheck(turn, newx, newy, -1, -1); // Checks south
+	private static void doFlip(int turn, int newx, int newy, int[][] board) {
+		flipCheck(turn, newx, newy, -1, 0, board); // Checks west
+		flipCheck(turn, newx, newy, -1, 1, board); // Checks north-west
+		flipCheck(turn, newx, newy, 0, 1, board); // Checks north
+		flipCheck(turn, newx, newy, 1, 1, board); // Checks north-east
+		flipCheck(turn, newx, newy, 1, 0, board); // Checks east
+		flipCheck(turn, newx, newy, 1, -1, board); // Checks south-east
+		flipCheck(turn, newx, newy, 0, -1, board); // Checks south
+		flipCheck(turn, newx, newy, -1, -1, board); // Checks south
 	}
 
 	/* flipCheck - actually flips the tiles in a specific direction
 	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
-			int diry) {
->>>>>>> 80aa0f18d87d0a0f076b104c2c518e8f4cb29295
+			int diry, int[][] board) {
 		int player, oppositePlayer;
 		int currentx = newx;
 		int currenty = newy;
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-<<<<<<< HEAD
-     	if (turn%2==0) {
-     		player = 1;
-     		oppositePlayer = 2;
-     	} else {
-     		player = 2;
-     		oppositePlayer = 1;
-     	}
-
-     	if (currentx+dirx<8 && currentx+dirx>=0 && currenty+diry<8 && currenty+diry>=0 && board[currentx+dirx][currenty+diry]==oppositePlayer) {
-         	flipThis = flipCheck(turn, currentx+dirx, currenty+diry, dirx, diry);
-       } else if (currentx+dirx<8 && currentx+dirx>=0 && currenty+diry<8 && currenty+diry>=0 && board[currentx+dirx][currenty+diry]==player)
-         	return true;
-       
-       if (flipThis) {
-       	board[currentx+dirx][currenty+diry] = player;
-       	return true;
-       }
-
-       return false;
-   }
-    
-	private static void printTable() {
-		for(int i=0;i<board.length;i++){
-			for(int j=0;j<board.length;j++){
-              	if (board[i][j] == 1)
-					System.out.print(board[i][j]+ "\t");
-              	else if (board[i][j] == 2)
-                  	System.out.print(board[i][j] + "\t" );
-                else
-                	System.out.print(board[i][j] + "\t");
-=======
 		if (turn % 2 == 0) {
 			player = 1;
 			oppositePlayer = 2;
@@ -274,7 +199,57 @@ public class main {
 				&& currenty + diry >= 0
 				&& board[currentx + dirx][currenty + diry] == oppositePlayer) {
 			flipThis = flipCheck(turn, currentx + dirx, currenty + diry, dirx,
-					diry);
+					diry, board);
+		} else if (currentx + dirx < 8 && currentx + dirx >= 0
+				&& currenty + diry < 8 && currenty + diry >= 0
+				&& board[currentx + dirx][currenty + diry] == player)
+			return true;
+
+		if (flipThis) {
+			board[currentx + dirx][currenty + diry] = player;
+			return true;
+		}
+
+		return false;
+	}
+	
+	/* doFlip - flips all pieces that were effected by a move
+	 * 
+	 */
+	private static void doFlip(int turn, int newx, int newy) {
+		flipCheck(turn, newx, newy, -1, 0); // Checks west
+		flipCheck(turn, newx, newy, -1, 1); // Checks north-west
+		flipCheck(turn, newx, newy, 0, 1); // Checks north
+		flipCheck(turn, newx, newy, 1, 1); // Checks north-east
+		flipCheck(turn, newx, newy, 1, 0); // Checks east
+		flipCheck(turn, newx, newy, 1, -1); // Checks south-east
+		flipCheck(turn, newx, newy, 0, -1); // Checks south
+		flipCheck(turn, newx, newy, -1, -1); // Checks south
+	}
+
+	/* flipCheck - actually flips the tiles in a specific direction
+	 */
+	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
+			int diry) {
+		int player, oppositePlayer;
+		int currentx = newx;
+		int currenty = newy;
+		boolean flipThis = false;
+
+		// define who attacking and defending players are based on turn
+		if (turn % 2 == 0) {
+			player = 1;
+			oppositePlayer = 2;
+		} else {
+			player = 2;
+			oppositePlayer = 1;
+		}
+
+		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
+				&& currenty + diry >= 0
+				&& board[currentx + dirx][currenty + diry] == oppositePlayer) {
+			flipThis = flipCheck(turn, currentx + dirx, currenty + diry, dirx,
+					diry, board);
 		} else if (currentx + dirx < 8 && currentx + dirx >= 0
 				&& currenty + diry < 8 && currenty + diry >= 0
 				&& board[currentx + dirx][currenty + diry] == player)
@@ -295,93 +270,23 @@ public class main {
 	private static void printTable() {
 		for (int i = 0; i < board.length; i++) {
 			if (i == 0)
-				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
-			System.out.print(i + " |");
+				System.out.println("    0 1 2 3 4 5 6 7\n   ----------------");
+			System.out.print(i + " | ");
 			for (int j = 0; j < board.length; j++) {
-				if (board[i][j] == 1)
+				if (board[i][j] == 1){
+					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
+				}
+				else if (board[i][j] == 2){
+					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
+				}
+				else{
 					System.out.print(board[i][j] + " ");
-				else if (board[i][j] == 2)
-					System.out.print(board[i][j] + " ");
-				else
-					System.out.print(board[i][j] + " ");
->>>>>>> 80aa0f18d87d0a0f076b104c2c518e8f4cb29295
+				}
 			}
 			System.out.println();
 		}
 	}
-<<<<<<< HEAD
 
-=======
-	
-	/* notFull - a useless method that checks if every tile is occupied
-	 * 
-	 */
->>>>>>> 80aa0f18d87d0a0f076b104c2c518e8f4cb29295
-	private static boolean notFull() {
-		for (int i = 0; i < board.length; i++)
-			for (int j = 0; j < board[0].length; j++)
-				if (board[i][j] == 0)
-					return true;
-		return false;
-	}
-
-<<<<<<< HEAD
-		a[3][3]=1;
-		a[4][4]=1;
-		a[3][4]=2;
-		a[4][3]=2;
-				
-	}
-  	
-  	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
-		int player, oppositePlayer;
-		// define who attacking and defending players are based on turn
-     	if (turn % 2 ==0) {
-     		player = 1;
-     		oppositePlayer = 2;
-     	} else {
-     		player = 2;
-     		oppositePlayer = 1;
-     	}
-     	
-      boolean capture = false;
-    	while (X+dirX < 8 && X+dirX >= 0 && Y+dirY < 8 && Y+dirY >= 0 && board[X+dirX][Y+dirY]==oppositePlayer) {
-    		
-        	X = X+dirX; Y = Y+dirY;
-        	capture = true;
-    	}
-    	if (capture == false) return false;
-    	
-    	if (X+dirX < 8 && X+dirX >= 0 && Y+dirY < 8 && Y+dirY >= 0 && board[X+dirX][Y+dirY]== player)
-        	return true;
-    	
-    	else return false;
-	}
-
-  
-  	public static boolean Legal(int X, int Y){
-    	int i,j, captures;
-    	captures = 0;
-    	if (board[X][Y]!=0) return false;
-    		for (i=-1; i<=1; i++)
-				for (j=-1; j<=1; j++)
-	   			 	if ((i!=0 || j!=0) && CanFlip(X, Y, i, j))
-						return true;
-    	return false;
-	}
-  	
-  	public static LinkedList<Node> allNextMoves (){
-  	 	LinkedList<Node> nextMoves= new LinkedList<Node>();
-  		for(int i=0;i<board.length;i++)
-  	      for(int j=0;j<board[0].length;j++)
-  	      	if(Legal(i,j)){
-  	      		Node newNode = new Node(i,j);
-  	      	nextMoves.add(newNode);
-  	      	}	
-  		return nextMoves;
-  	  }
-  	
-=======
 	/* initializeTable - creates the initial playing board
 	 * 
 	 */
@@ -471,18 +376,15 @@ public class main {
 	 * 
 	 */
 	public static void shittyHeuristic() {
-		for (int i = 0; i < moveValues.length; i++) {
-			for (int j = 0; j < moveValues[i].length; j++) {
-				if (i < 4)
-					moveValues[i][j] += 4 - i;
-				if (i >= 4)
-					moveValues[i][j] += i % 4;
-				if (j < 4)
-					moveValues[i][j] += 4 - j;
-				if (j >= 4)
-					moveValues[i][j] += j % 4;
-			}
-		}
+		int[][] shit = {{20, -3, 11, 8, 8, 11, -3, 20},
+				{-3, -7, -4, 1, 1, -4, -7, -3},
+				{11, -4, 2, 2, 2, 2, -4, 11},
+				{8, 1, 2, -3, -3, 2, 1, 8},
+				{8, 1, 2, -3, -3, 2, 1, 8},
+				{11, -4, 2, 2, 2, 2, -4, 11},
+				{-3, -7, -4, 1, 1, -4, -7, -3},
+				{20, -3, 11, 8, 8, 11, -3, 20}};
+		moveValues = shit;
 	}
 
 	/* refreshMoveValues - refreshes every position in the parallel moveValues array to zero
@@ -503,7 +405,7 @@ public class main {
 		for (int i = 0; i < moveValues.length; i++) {
 			if (i == 0)
 				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
-			System.out.print(i + " |");
+			System.out.print(i + " | ");
 			for (int j = 0; j < moveValues.length; j++) {
 				if (moveValues[i][j] == 1)
 					System.out.print(moveValues[i][j] + " ");
@@ -515,5 +417,4 @@ public class main {
 			System.out.println();
 		}
 	}
->>>>>>> 80aa0f18d87d0a0f076b104c2c518e8f4cb29295
 }
