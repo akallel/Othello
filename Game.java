@@ -61,12 +61,7 @@ public class Game {
 		}
 
 		// count who won if the board is full
-		if (howMany(1) > howMany(2))
-			return -1;
-		else if (howMany(1) < howMany(2))
-			return 1;
-		else
-			return 0;
+		return howMany(2) - howMany(1);
 	}
 
 	/*

@@ -55,7 +55,7 @@ public class main {
 					board[n1][n2] = 1;
 
 					// flip the resulting changed tiles
-					doFlip(turn, n1, n2, board);
+					doFlip(turn, n1, n2);
 
 					// increment the turn
 					turn++;
@@ -75,42 +75,23 @@ public class main {
 					noMoves = true;
 				} else {
 					noMoves = false;
-					Game a,b,c;
-					a = new Game(move(nodes.get(0)), turn, noMoves, gameOver);
-					if(nodes.size() < 2)
-						b = null;
-					else b = new Game(move(nodes.get(1)), turn, noMoves, gameOver);
-					if(nodes.size() < 3)
-						c = null;
-					else c = new Game(move(nodes.get(2)), turn, noMoves, gameOver);
+					Game[] leaves = new Game[nodes.size()];
+					for(int i = 0; i < leaves.length; i++){
+						leaves[i] = new Game(move(nodes.get(i)), turn, noMoves, gameOver);
+					}
 					
-					int aResult, bResult, cResult = a.play();
-					aResult = a.play();
-					if(b == null)
-						bResult = -2;
-					else bResult = b.play();
-					if(c == null)
-						cResult = -2;
-					else cResult = c.play();
+					int[] leafResults = new int[leaves.length];
+					for(int i = 0; i < leafResults.length; i++){
+						leafResults[i] = leaves[i].play();
+					}
 					
-					int move = bestMove(aResult, bResult, cResult);
-					int[] n = {nodes.get(0).X, nodes.get(0).Y};
-					if(move == 0){
-						
-					}
-					else if(move == 1){
-						n[0] = nodes.get(1).X;
-						n[1] = nodes.get(1).Y;
-					}
-					else{
-						n[0] = nodes.get(2).X;
-						n[1] = nodes.get(2).Y;
-					}
+					int bestMove = bestMove(leafResults);
+					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
 					
 					System.out.println("Computer moves to: (" + n[0] + ","
 							+ n[1] + ")");
 					board[n[0]][n[1]] = 2;
-					doFlip(turn, n[0], n[1], board);
+					doFlip(turn, n[0], n[1]);
 					turn++;
 					printTable();
 				}
@@ -140,25 +121,21 @@ public class main {
 		newBoard[n.Y][n.X] = 1;
 
 		// flip the resulting changed tiles
-		doFlip(turn, n.Y, n.X, board);
+		doFlip(turn, n.Y, n.X, newBoard);
 		return newBoard;
 	}
 
 	/* bestMove - traverses the 2D array, recording the coordinates of the best valued position
 	 * 
 	 */
-	private static int bestMove(int aResult, int bResult, int cResult) {
-		if(aResult > bResult){
-			if(aResult > cResult){
-				return 0;
-			}
-			if(aResult < cResult){
-				return 2;
+	private static int bestMove(int[] leafResults) {
+		int index = 0;
+		for(int i = 1; i < leafResults.length; i++){
+			if(leafResults[i] > leafResults[index]){
+				index = i;
 			}
 		}
-		return 1;
-			
-		
+		return index;
 	}
 	
 	/* validMove - identifies if a provided (x,y) coordinate is a valid position to place a tile
@@ -204,6 +181,56 @@ public class main {
 	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry, int[][] board) {
+		int player, oppositePlayer;
+		int currentx = newx;
+		int currenty = newy;
+		boolean flipThis = false;
+
+		// define who attacking and defending players are based on turn
+		if (turn % 2 == 0) {
+			player = 1;
+			oppositePlayer = 2;
+		} else {
+			player = 2;
+			oppositePlayer = 1;
+		}
+
+		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
+				&& currenty + diry >= 0
+				&& board[currentx + dirx][currenty + diry] == oppositePlayer) {
+			flipThis = flipCheck(turn, currentx + dirx, currenty + diry, dirx,
+					diry, board);
+		} else if (currentx + dirx < 8 && currentx + dirx >= 0
+				&& currenty + diry < 8 && currenty + diry >= 0
+				&& board[currentx + dirx][currenty + diry] == player)
+			return true;
+
+		if (flipThis) {
+			board[currentx + dirx][currenty + diry] = player;
+			return true;
+		}
+
+		return false;
+	}
+	
+	/* doFlip - flips all pieces that were effected by a move
+	 * 
+	 */
+	private static void doFlip(int turn, int newx, int newy) {
+		flipCheck(turn, newx, newy, -1, 0); // Checks west
+		flipCheck(turn, newx, newy, -1, 1); // Checks north-west
+		flipCheck(turn, newx, newy, 0, 1); // Checks north
+		flipCheck(turn, newx, newy, 1, 1); // Checks north-east
+		flipCheck(turn, newx, newy, 1, 0); // Checks east
+		flipCheck(turn, newx, newy, 1, -1); // Checks south-east
+		flipCheck(turn, newx, newy, 0, -1); // Checks south
+		flipCheck(turn, newx, newy, -1, -1); // Checks south
+	}
+
+	/* flipCheck - actually flips the tiles in a specific direction
+	 */
+	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
+			int diry) {
 		int player, oppositePlayer;
 		int currentx = newx;
 		int currenty = newy;
