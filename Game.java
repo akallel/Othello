@@ -111,6 +111,46 @@ public class Game {
 	}
 
 	/*
+	 * numOfEmptyAdj - Returns the number of adjancent tiles of a given player
+	 */
+	private static int numOfEmptyAdj(int a) {
+		ArrayList<Node> myPieces = whereAreMyPieces(a);
+		int answer = 0;
+		for (int i = 0; i < myPieces.size(); i++) {
+			int tempX = myPieces.get(i).Y;
+			int tempY = myPieces.get(i).X;
+			if (tempX > 0) {
+				if (board[tempX-1][tempY+0] == 0) answer++; // check west
+				if (tempY > 0) if (board[tempX-1][tempY+1] == 0) answer++; // check northwest
+				if (tempY < 7) if (board[tempX-1][tempY-1] == 0) answer++; // check southwest
+			}
+			if (tempX < 7) {
+				if (tempY > 0) if (board[tempX+1][tempY+1] == 0) answer++;	// check northeast
+				if (board[tempX+1][tempY+0] == 0) answer++;	// check east
+				if (tempY < 7) if (board[tempX+1][tempY-1] == 0) answer++; // check southeast
+			}
+			if (tempY > 0) if (board[tempX+0][tempY+1] == 0) answer++; // check north
+			if (tempY < 7) if (board[tempX+0][tempY-1] == 0) answer++; // check south
+				
+		}
+		return answer;
+	}
+
+	/*
+	 * whereAreMyPieces - returns the coordinates of a player's pieces
+	 */
+	private static ArrayList<Node> whereAreMyPieces(int a) {
+		ArrayList<Node> myPieces = new ArrayList<Node>();
+		for (int i = 0; i < board.length; i++)
+			for (int j = 0; j < board[0].length; j++)
+				if (board[i][j] == a) {
+					Node newNode = new Node(i, j);
+					myPieces.add(newNode);
+				}
+		return myPieces;
+	}
+
+	/*
 	 * doFlip - flips all pieces that were effected by a move
 	 */
 	private static void doFlip(int turn, int newx, int newy) {

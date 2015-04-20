@@ -86,7 +86,7 @@ public class main {
 					
 					int bestMove = bestMove(leafResults);
 					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
-					
+
 					System.out.println("Computer moves to: (" + n[0] + ","
 							+ n[1] + ")");
 					board[n[0]][n[1]] = 2;
@@ -160,6 +160,55 @@ public class main {
 			}
 		}
 		return answer;
+	}
+
+	/*
+	 * numOfEmptyAdj - Returns the number of adjancent tiles of a given player
+	 */
+	private static int numOfEmptyAdj(int a) {
+		ArrayList<Node> myPieces = whereAreMyPieces(a);
+		int answer = 0;
+		for (int i = 0; i < myPieces.size(); i++) {
+			int tempX = myPieces.get(i).Y;
+			int tempY = myPieces.get(i).X;
+			System.out.printf("board[%d][%d] = %d\n", tempX-1, tempY, board[tempX-1][tempY]);
+			if (tempX > 0) {
+				if (board[tempX-1][tempY+0] == 0) {System.out.println("checked west"); answer++;} // check west
+				if (tempY < 7)
+					if (board[tempX-1][tempY+1] == 0) {System.out.println("checked southwest["+(tempX-1)+","+(tempY+1)+"]"); answer++;} // check southwest
+				if (tempY > 0)
+					if (board[tempX-1][tempY-1] == 0) {System.out.println("checked northwest"); answer++;} // check northwest
+			}
+			if (tempX < 7) {
+				if (tempY < 7)
+					if (board[tempX+1][tempY+1] == 0) {System.out.println("checked southeast"); answer++;}	// check southeast
+				if (board[tempX+1][tempY+0] == 0) {System.out.println("checked east"); answer++;}	// check east
+				if (tempY > 0)
+					if (board[tempX+1][tempY-1] == 0) {System.out.println("checked northeast"); answer++;} // check northeast
+			}
+			if (tempY < 7)
+				if (board[tempX+0][tempY+1] == 0) {System.out.println("checked south"); answer++;} // check south
+			if (tempY > 0)
+				if (board[tempX+0][tempY-1] == 0) {System.out.println("checked north"); answer++;} // check north
+				
+		}
+		System.out.println("Player " +(a)+ " has " +answer+ " number of empty adjancent tiles.");
+		return answer;
+	}
+
+	/*
+	 * whereAreMyPieces - returns the coordinates of a player's pieces
+	 */
+	private static ArrayList<Node> whereAreMyPieces(int a) {
+		ArrayList<Node> myPieces = new ArrayList<Node>();
+		for (int i = 0; i < board.length; i++)
+			for (int j = 0; j < board[0].length; j++)
+				if (board[i][j] == a) {
+					Node newNode = new Node(i, j);
+					myPieces.add(newNode);
+				}
+		System.out.println("my pieces are at: "+myPieces);
+		return myPieces;
 	}
 
 	/* doFlip - flips all pieces that were effected by a move
@@ -284,6 +333,7 @@ public class main {
 			}
 			System.out.println();
 		}
+		numOfEmptyAdj(turn%2+1);
 	}
 
 	/* initializeTable - creates the initial playing board
@@ -298,7 +348,6 @@ public class main {
 		a[4][4] = 1;
 		a[3][4] = 2;
 		a[4][3] = 2;
-
 	}
 
 	/*
