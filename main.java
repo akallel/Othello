@@ -75,9 +75,9 @@ public class main {
 					noMoves = true;
 				} else {
 					noMoves = false;
-					Game[] leaves = new Game[nodes.size()];
+					Game2[] leaves = new Game2[nodes.size()];
 					for(int i = 0; i < leaves.length; i++){
-						leaves[i] = new Game(move(nodes.get(i)), turn, noMoves, gameOver);
+						leaves[i] = new Game2(move(nodes.get(i)), turn, noMoves, gameOver);
 					}
 					
 					int[] leafResults = new int[leaves.length];
@@ -86,6 +86,7 @@ public class main {
 					}
 					
 					int bestMove = bestMove(leafResults);
+					System.out.println("best for " + turn +" is " +bestMove);
 					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
 					
 					System.out.println("Computer moves to: (" + n[0] + ","
@@ -105,6 +106,11 @@ public class main {
 			System.out.println("Player 2 wins");
 		else
 			System.out.println("Draw game");
+		
+		System.out.println();
+		System.out.println("player 1 has "+ howMany(1) + " tiles");
+		System.out.println("player 2 has "+ howMany(2) + " tiles");
+
 	}
 	
 	/* move - creates a new board with a potential computer move
@@ -274,10 +280,10 @@ public class main {
 			System.out.print(i + " | ");
 			for (int j = 0; j < board.length; j++) {
 				if (board[i][j] == 1){
-					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
+					System.out.print(board[i][j] + " " );
 				}
 				else if (board[i][j] == 2){
-					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
+					System.out.print(board[i][j] + " ");
 				}
 				else{
 					System.out.print(board[i][j] + " ");

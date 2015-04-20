@@ -1,18 +1,24 @@
 import java.util.ArrayList;
 
-public class Game {
+public class Game2 {
 	static int turn;
 	static int[][] board = new int[8][8];
-	static int[][] moveValues = { { 20, -3, 11, 8, 8, 11, -3, 20 },
-			{ -3, -7, -4, 1, 1, -4, -7, -3 }, { 11, -4, 2, 2, 2, 2, -4, 11 },
-			{ 8, 1, 2, -3, -3, 2, 1, 8 }, { 8, 1, 2, -3, -3, 2, 1, 8 },
-			{ 11, -4, 2, 2, 2, 2, -4, 11 }, { -3, -7, -4, 1, 1, -4, -7, -3 },
-			{ 20, -3, 11, 8, 8, 11, -3, 20 } };
+	static int[][] moveValues = 
+		{ 
+			{ 20, -3, 11, 8, 8, 11, -3, 20 },
+			{ -3, -7, -4, 1, 1, -4, -7, -3 },
+			{ 11, -4, 2, 2, 2, 2, -4, 11 },
+			{ 8, 1, 2, -3, -3, 2, 1, 8 },
+			{ 8, 1, 2, -3, -3, 2, 1, 8 },
+			{ 11, -4, 2, 2, 2, 2, -4, 11 },
+			{ -3, -7, -4, 1, 1, -4, -7, -3 },
+			{ 20, -3, 11, 8, 8, 11, -3, 20 }
+		};
 
 	static boolean noMoves = false;
 	static boolean gameOver = false;
 
-	public Game(int[][] board, int turn, boolean noMoves, boolean gameOver) {
+	public Game2(int[][] board, int turn, boolean noMoves, boolean gameOver) {
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board.length; j++) {
 				this.board[i][j] = board[i][j];
@@ -69,20 +75,51 @@ public class Game {
 	 */
 	private static int[] bestMove(ArrayList<Node> possMoves) {
 		int x = possMoves.get(0).X;
-		int y = possMoves.get(0).Y;
+		int y = possMoves.get(0).Y; 
+		moveValues[y][x]= moveValues[y][x]+fakeGain(turn,board, fakeFlip(turn, possMoves.get(0).Y, possMoves.get(0).X));
 		int val = moveValues[y][x];
-
+		
 		for (int i = 1; i < possMoves.size(); i++) {
-			if (val < moveValues[possMoves.get(i).Y][possMoves.get(i).X]) {
+			//System.out.println(i+":   Fake gain is for : ("+ possMoves.get(i).Y + ","+ possMoves.get(i).X + ") is "+ fakeGain(turn,board, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X)));
+			moveValues[possMoves.get(i).Y][possMoves.get(i).X]= moveValues[possMoves.get(i).Y][possMoves.get(i).X]+ fakeGain(turn,board, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X));
+			if (val <moveValues[possMoves.get(i).Y][possMoves.get(i).X] )
+			{
 				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
 				x = possMoves.get(i).X;
 				y = possMoves.get(i).Y;
 			}
 		}
-		int[] n = { x, y };
+		int[] n = {x, y};
+		//printTable(moveValues);
+		//rest after each move to only change the possible next moves.
+		shittyHeuristic();
 		return n;
 	}
 
+	/* printTable - not sure why we have specific methods to print two identically-sized
+	 * 2D arrays... but oh well. "Memory is cheap" - Ted
+	 * 
+	 */
+	private static void printTable(int [][] board) {
+		for (int i = 0; i < board.length; i++) {
+			if (i == 0)
+				System.out.println("    0 1 2 3 4 5 6 7\n   ----------------");
+			System.out.print(i + " | ");
+			for (int j = 0; j < board.length; j++) {
+				if (board[i][j] == 1){
+					System.out.print(board[i][j] + " " );
+				}
+				else if (board[i][j] == 2){
+					System.out.print(board[i][j] + " ");
+				}
+				else{
+					System.out.print(board[i][j] + " ");
+				}
+			}
+			System.out.println();
+		}
+	}
+	
 	/*
 	 * validMove - identifies if a provided (x,y) coordinate is a valid position
 	 * to place a tile
@@ -107,6 +144,88 @@ public class Game {
 			}
 		}
 		return answer;
+	}
+	
+	private static int howManyFake(int [][] fake,int a) {
+		int answer = 0;
+		for (int i = 0; i < fake.length; i++) {
+			for (int j = 0; j < fake[0].length; j++) {
+				if (fake[i][j] == a)
+					answer++;
+			}
+		}
+		return answer;
+	}
+	
+	/*
+	 * Calculates the fake gain in a fake next move situation and returns the max of that and the current table. 
+	 * Probably not exactly right, but the difference of howmanyfake and howmany would give mostly 0 and that doesnt help. 
+	 * */
+	private static int fakeGain(int turn, int [][] board, int [][] fakeBoard){
+		if(turn%2 ==0) return Math.max(howManyFake(fakeBoard,1),howMany(1));
+		else return Math.max(howManyFake(fakeBoard,2),howMany(2));
+	}
+	
+	// basically creates a fake board without messing with the actual board
+	// we kind of did this before with adding an extra parameter, but I forgot and did it again. 
+	private static int [][] fakeFlip(int turn, int newx, int newy){
+		int [][] copyboard = copyBoard(board); 
+		fakeFlipCheck(copyboard,turn, newx, newy, -1, 0); // Checks west
+		fakeFlipCheck(copyboard,turn, newx, newy, -1, 1); // Checks north-west
+		fakeFlipCheck(copyboard,turn, newx, newy, 0, 1); // Checks north
+		fakeFlipCheck(copyboard,turn, newx, newy, 1, 1); // Checks north-east
+		fakeFlipCheck(copyboard,turn, newx, newy, 1, 0); // Checks east
+		fakeFlipCheck(copyboard,turn, newx, newy, 1, -1); // Checks south-east
+		fakeFlipCheck(copyboard,turn, newx, newy, 0, -1); // Checks south
+		fakeFlipCheck(copyboard,turn, newx, newy, -1, -1); // Checks south
+	return copyboard;
+	}
+	
+	/*
+	 * Again, flips the fake board and returns a new state of the board that we are considering for best move
+	 * */
+	private static int[][] fakeFlipCheck(int [][] copyboard,int turn, int newx, int newy, int dirx,
+			int diry) {
+		int player, oppositePlayer;
+		int currentx = newx;
+		int currenty = newy;
+		boolean flipThis = false;
+		
+		// define who attacking and defending players are based on turn
+		if (turn % 2 == 0) {
+			player = 1;
+			oppositePlayer = 2;
+		} else {
+			player = 2;
+			oppositePlayer = 1;
+		}
+
+		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
+				&& currenty + diry >= 0
+				&& copyboard[currentx + dirx][currenty + diry] == oppositePlayer) {
+			flipThis = flipCheck(turn, currentx + dirx, currenty + diry, dirx,
+					diry);
+		} else if (currentx + dirx < 8 && currentx + dirx >= 0
+				&& currenty + diry < 8 && currenty + diry >= 0
+				&& copyboard[currentx + dirx][currenty + diry] == player)
+			//return true;
+
+		if (flipThis) {
+			copyboard[currentx + dirx][currenty + diry] = player;
+			//return true;
+		}
+
+		//return false;
+		return copyboard;
+	}
+	
+	/*Deep copy of the board, just to keep the global board safe from African danger and other unwanted changes.*/
+	private static int[][] copyBoard(int[][] board)	 {
+		int [][] a = new int [board.length][board[0].length];
+		for(int i=0;i<board.length;i++)
+			for (int j=0;j<board.length;j++)
+				a[i][j]= board[i][j];
+		return a;
 	}
 
 	/*
@@ -227,5 +346,20 @@ public class Game {
 					nextMoves.add(newNode);
 				}
 		return nextMoves;
+	}
+	/* shittyHeuristic - a rough, initial heuristic that simply
+	 * prioritizes corners > edges > inner rings
+	 * 
+	 */
+	public static void shittyHeuristic() {
+		int[][] shit = {{20, -3, 11, 8, 8, 11, -3, 20},
+				{-3, -7, -4, 1, 1, -4, -7, -3},
+				{11, -4, 2, 2, 2, 2, -4, 11},
+				{8, 1, 2, -3, -3, 2, 1, 8},
+				{8, 1, 2, -3, -3, 2, 1, 8},
+				{11, -4, 2, 2, 2, 2, -4, 11},
+				{-3, -7, -4, 1, 1, -4, -7, -3},
+				{20, -3, 11, 8, 8, 11, -3, 20}};
+		moveValues = shit;
 	}
 }
