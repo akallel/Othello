@@ -77,19 +77,20 @@ public class main {
 					noMoves = false;
 					Game[] leaves = new Game[nodes.size()];
 					for(int i = 0; i < leaves.length; i++){
-						leaves[i] = new Game(move(nodes.get(i)), turn, noMoves, gameOver);
+						leaves[i] = new Game(move(nodes.get(i)), turn + 1, noMoves, gameOver);
 					}
 					
 					int[] leafResults = new int[leaves.length];
 					for(int i = 0; i < leafResults.length; i++){
 						leafResults[i] = leaves[i].play();
+						System.out.println(leafResults[i]);
 					}
 					
 					int bestMove = bestMove(leafResults);
 					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
-					
-					System.out.println("Computer moves to: (" + n[0] + ","
-							+ n[1] + ")");
+					System.out.println("Best Move for computer: " + bestMove);
+					System.out.println("Computer moves to: (" + n[1] + ","
+							+ n[0] + ")");
 					board[n[0]][n[1]] = 2;
 					doFlip(turn, n[0], n[1]);
 					turn++;
@@ -118,10 +119,10 @@ public class main {
 			}
 		}
 		
-		newBoard[n.Y][n.X] = 1;
+		newBoard[n.Y][n.X] = 2;
 
 		// flip the resulting changed tiles
-		doFlip(turn, n.Y, n.X, newBoard);
+		doFlip(turn, n.X, n.Y, newBoard);
 		return newBoard;
 	}
 
