@@ -2,17 +2,17 @@ import java.util.ArrayList;
 
 public class Game2 {
 	static int turn;
-	static int[][] board = new int[8][8];
+	static int[][] board2 = new int[8][8];
 	static int[][] moveValues = 
-		{ 
-			{ 20, -3, 11, 8, 8, 11, -3, 20 },
+		{
+			{ 50, -3, 11, 8, 8, 11, -3, 50 },
 			{ -3, -7, -4, 1, 1, -4, -7, -3 },
 			{ 11, -4, 2, 2, 2, 2, -4, 11 },
 			{ 8, 1, 2, -3, -3, 2, 1, 8 },
 			{ 8, 1, 2, -3, -3, 2, 1, 8 },
 			{ 11, -4, 2, 2, 2, 2, -4, 11 },
 			{ -3, -7, -4, 1, 1, -4, -7, -3 },
-			{ 20, -3, 11, 8, 8, 11, -3, 20 }
+			{ 50, -3, 11, 8, 8, 11, -3, 50 }
 		};
 
 	static boolean noMoves = false;
@@ -21,7 +21,7 @@ public class Game2 {
 	public Game2(int[][] board, int turn, boolean noMoves, boolean gameOver) {
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board.length; j++) {
-				this.board[i][j] = board[i][j];
+				board2[i][j] = board[i][j];
 			}
 		}
 		this.turn = turn;
@@ -42,7 +42,7 @@ public class Game2 {
 					noMoves = false;
 					// printMoveValues();
 					int[] n = bestMove(nodes);
-					board[n[0]][n[1]] = 2;
+					board2[n[0]][n[1]] = 1; // player ONE!!!
 					doFlip(turn, n[0], n[1]);
 					turn++;
 				}
@@ -59,14 +59,14 @@ public class Game2 {
 					noMoves = false;
 					// printMoveValues();
 					int[] n = bestMove(nodes);
-					board[n[0]][n[1]] = 2;
+					board2[n[0]][n[1]] = 2;
 					doFlip(turn, n[0], n[1]);
 					turn++;
 				}
 			}
 		}
 		// count who won if the board is full
-		return howMany(2) - howMany(1);
+		return howMany(2) 	- howMany(1);
 	}
 
 	/*
@@ -76,19 +76,22 @@ public class Game2 {
 	private static int[] bestMove(ArrayList<Node> possMoves) {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y; 
-		moveValues[y][x]= moveValues[y][x]+fakeGain(turn,board, fakeFlip(turn, possMoves.get(0).Y, possMoves.get(0).X));
+		moveValues[y][x]= moveValues[y][x] + fakeGain(turn,board2, fakeFlip(turn, possMoves.get(0).X, possMoves.get(0).Y));
 		int val = moveValues[y][x];
 		
 		for (int i = 1; i < possMoves.size(); i++) {
 			//System.out.println(i+":   Fake gain is for : ("+ possMoves.get(i).Y + ","+ possMoves.get(i).X + ") is "+ fakeGain(turn,board, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X)));
-			moveValues[possMoves.get(i).Y][possMoves.get(i).X]= moveValues[possMoves.get(i).Y][possMoves.get(i).X]+ fakeGain(turn,board, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X));
-			if (val <moveValues[possMoves.get(i).Y][possMoves.get(i).X] )
+			moveValues[possMoves.get(i).Y][possMoves.get(i).X]= 
+					moveValues[possMoves.get(i).Y][possMoves.get(i).X] + fakeGain(turn,board2, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X));
+			if (val < moveValues[possMoves.get(i).Y][possMoves.get(i).X] )
 			{
 				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
+				
 				x = possMoves.get(i).X;
 				y = possMoves.get(i).Y;
 			}
 		}
+		//System.out.println("The best value for turn is "+val);
 		int[] n = {x, y};
 		//printTable(moveValues);
 		//rest after each move to only change the possible next moves.
@@ -137,9 +140,9 @@ public class Game2 {
 	 */
 	private static int howMany(int a) {
 		int answer = 0;
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[0].length; j++) {
-				if (board[i][j] == a)
+		for (int i = 0; i < board2.length; i++) {
+			for (int j = 0; j < board2[0].length; j++) {
+				if (board2[i][j] == a)
 					answer++;
 			}
 		}
@@ -169,7 +172,7 @@ public class Game2 {
 	// basically creates a fake board without messing with the actual board
 	// we kind of did this before with adding an extra parameter, but I forgot and did it again. 
 	private static int [][] fakeFlip(int turn, int newx, int newy){
-		int [][] copyboard = copyBoard(board); 
+		int [][] copyboard = copyBoard(board2); 
 		fakeFlipCheck(copyboard,turn, newx, newy, -1, 0); // Checks west
 		fakeFlipCheck(copyboard,turn, newx, newy, -1, 1); // Checks north-west
 		fakeFlipCheck(copyboard,turn, newx, newy, 0, 1); // Checks north
@@ -263,16 +266,16 @@ public class Game2 {
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
 				&& currenty + diry >= 0
-				&& board[currentx + dirx][currenty + diry] == oppositePlayer) {
+				&& board2[currentx + dirx][currenty + diry] == oppositePlayer) {
 			flipThis = flipCheck(turn, currentx + dirx, currenty + diry, dirx,
 					diry);
 		} else if (currentx + dirx < 8 && currentx + dirx >= 0
 				&& currenty + diry < 8 && currenty + diry >= 0
-				&& board[currentx + dirx][currenty + diry] == player)
+				&& board2[currentx + dirx][currenty + diry] == player)
 			return true;
 
 		if (flipThis) {
-			board[currentx + dirx][currenty + diry] = player;
+			board2[currentx + dirx][currenty + diry] = player;
 			return true;
 		}
 
@@ -297,7 +300,7 @@ public class Game2 {
 
 		boolean capture = false;
 		while (X + dirX < 8 && X + dirX >= 0 && Y + dirY < 8 && Y + dirY >= 0
-				&& board[X + dirX][Y + dirY] == oppositePlayer) {
+				&& board2[X + dirX][Y + dirY] == oppositePlayer) {
 
 			X = X + dirX;
 			Y = Y + dirY;
@@ -307,7 +310,7 @@ public class Game2 {
 			return false;
 
 		if (X + dirX < 8 && X + dirX >= 0 && Y + dirY < 8 && Y + dirY >= 0
-				&& board[X + dirX][Y + dirY] == player)
+				&& board2[X + dirX][Y + dirY] == player)
 			return true;
 
 		else
@@ -322,7 +325,7 @@ public class Game2 {
 	public static boolean Legal(int X, int Y) {
 		int i, j, captures;
 		captures = 0;
-		if (board[X][Y] != 0)
+		if (board2[X][Y] != 0)
 			return false;
 		// method to explore
 		// up/down/left/right/upright/upleft/downright/downleft directions
@@ -339,8 +342,8 @@ public class Game2 {
 	 */
 	public static ArrayList<Node> allNextMoves() {
 		ArrayList<Node> nextMoves = new ArrayList<Node>();
-		for (int i = 0; i < board.length; i++)
-			for (int j = 0; j < board[0].length; j++)
+		for (int i = 0; i < board2.length; i++)
+			for (int j = 0; j < board2[0].length; j++)
 				if (Legal(i, j)) {
 					Node newNode = new Node(i, j);
 					nextMoves.add(newNode);
@@ -352,14 +355,14 @@ public class Game2 {
 	 * 
 	 */
 	public static void shittyHeuristic() {
-		int[][] shit = {{20, -3, 11, 8, 8, 11, -3, 20},
+		int[][] shit = {{50, -3, 11, 8, 8, 11, -3, 50},
 				{-3, -7, -4, 1, 1, -4, -7, -3},
 				{11, -4, 2, 2, 2, 2, -4, 11},
 				{8, 1, 2, -3, -3, 2, 1, 8},
 				{8, 1, 2, -3, -3, 2, 1, 8},
 				{11, -4, 2, 2, 2, 2, -4, 11},
 				{-3, -7, -4, 1, 1, -4, -7, -3},
-				{20, -3, 11, 8, 8, 11, -3, 20}};
+				{50, -3, 11, 8, 8, 11, -3, 50}};
 		moveValues = shit;
 	}
 }

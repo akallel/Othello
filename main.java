@@ -78,15 +78,19 @@ public class main {
 					Game2[] leaves = new Game2[nodes.size()];
 					for(int i = 0; i < leaves.length; i++){
 						leaves[i] = new Game2(move(nodes.get(i)), turn, noMoves, gameOver);
+						//printTable(leaves[i].board);
 					}
 					
 					int[] leafResults = new int[leaves.length];
-					for(int i = 0; i < leafResults.length; i++){
+					System.out.println("=====================================================");
+					for(int i =0; i <leafResults.length ; i++){
 						leafResults[i] = leaves[i].play();
 					}
-					
+					printTable(leafResults); // print all possibilities, all always equal which is kinda sketchy.
+					System.out.println("=====================================================");
+
 					int bestMove = bestMove(leafResults);
-					System.out.println("best for " + turn +" is " +bestMove);
+					System.out.println("best for " + turn +" is " + bestMove);
 					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
 					
 					System.out.println("Computer moves to: (" + n[0] + ","
@@ -113,6 +117,26 @@ public class main {
 
 	}
 	
+	private static void printTable(int [][] board) {
+		for (int i = 0; i < board.length; i++) {
+			if (i == 0)
+				System.out.println("    0 1 2 3 4 5 6 7\n   ----------------");
+			System.out.print(i + " | ");
+			for (int j = 0; j < board.length; j++) {
+				if (board[i][j] == 1){
+					System.out.print(board[i][j] + " " );
+				}
+				else if (board[i][j] == 2){
+					System.out.print(board[i][j] + " ");
+				}
+				else{
+					System.out.print(board[i][j] + " ");
+				}
+			}
+			System.out.println();
+		}
+	}
+
 	/* move - creates a new board with a potential computer move
 	 * 
 	 */
@@ -137,10 +161,13 @@ public class main {
 	private static int bestMove(int[] leafResults) {
 		int index = 0;
 		for(int i = 1; i < leafResults.length; i++){
-			if(leafResults[i] > leafResults[index]){
+			System.out.println("leafResults i "+leafResults[i]+ " and leafResults of index "+ leafResults[index]);
+			
+			if(leafResults[i] >= leafResults[index]){
 				index = i;
 			}
 		}
+		System.out.println("INDEX "+index);
 		return index;
 	}
 	
@@ -293,6 +320,17 @@ public class main {
 		}
 	}
 
+	/* printTable - not sure why we have specific methods to print two identically-sized
+	 * 2D arrays... but oh well. "Memory is cheap" - Ted
+	 * 
+	 */
+	private static void printTable(int[] leafResults) {
+		for (int i = 0; i < leafResults.length; i++) {
+			System.out.print(leafResults[i]+ "  ");
+		}
+		System.out.println();
+	}
+	
 	/* initializeTable - creates the initial playing board
 	 * 
 	 */
