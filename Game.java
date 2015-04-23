@@ -1,16 +1,19 @@
 import java.util.ArrayList;
 
 public class Game {
-	static int turn;
-	static int[][] board = new int[8][8];
-	static int[][] moveValues = { { 20, -3, 11, 8, 8, 11, -3, 20 },
-			{ -3, -7, -4, 1, 1, -4, -7, -3 }, { 11, -4, 2, 2, 2, 2, -4, 11 },
-			{ 8, 1, 2, -3, -3, 2, 1, 8 }, { 8, 1, 2, -3, -3, 2, 1, 8 },
-			{ 11, -4, 2, 2, 2, 2, -4, 11 }, { -3, -7, -4, 1, 1, -4, -7, -3 },
-			{ 20, -3, 11, 8, 8, 11, -3, 20 } };
+	static int gameNum;
+	int turn;
+	int[][] board = new int[8][8];
+	int[][] moveValues = { { 20, -3, 11, 8, 8, 11, -3, 20 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 }, { 11, -4, 2, 2, 2, 2, -4, 11 },
+				{ 8, 1, 2, -3, -3, 2, 1, 8 }, { 8, 1, 2, -3, -3, 2, 1, 8 },
+				{ 11, -4, 2, 2, 2, 2, -4, 11 }, { -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 20, -3, 11, 8, 8, 11, -3, 20 } };
 
-	static boolean noMoves = false;
-	static boolean gameOver = false;
+	boolean noMoves = false;
+	boolean gameOver = false;
+	int numTabs = 0;
+	int winValue;
 
 	public Game(int[][] board, int turn, boolean noMoves, boolean gameOver) {
 		for (int i = 0; i < board.length; i++) {
@@ -21,9 +24,11 @@ public class Game {
 		this.turn = turn;
 		this.noMoves = noMoves;
 		this.gameOver = gameOver;
+		this.play();
 	}
 	
-	public static int play(){
+	public void play() {
+		gameNum++;
 		while (!gameOver) {
 			if (turn % 2 == 0) {
 				ArrayList<Node> nodes = allNextMoves();
@@ -34,9 +39,26 @@ public class Game {
 					noMoves = true;
 				} else {
 					noMoves = false;
+					boolean corner = false;
+					Node cornerNode = null;
+					int[] n = new int[2];
+
+					for (int i = 0; i < nodes.size(); i++) {
+						if ((nodes.get(i).Y == 7) || (nodes.get(i).Y == 0))
+							if ((nodes.get(i).X == 7) || (nodes.get(i).X == 0)) {
+								corner = true;
+								cornerNode = nodes.get(i);
+							}
+					}
 					// printMoveValues();
-					int[] n = bestMove(nodes);
-					board[n[0]][n[1]] = 2;
+					
+					if (corner) {
+						n[0] = cornerNode.X;
+						n[1] = cornerNode.Y;
+					} else {
+						n = bestMove(nodes);
+					}
+					board[n[0]][n[1]] = 1;
 					doFlip(turn, n[0], n[1]);
 					turn++;
 				}
@@ -49,33 +71,63 @@ public class Game {
 					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
+					//System.out.println("No moves for *computer*");
 				} else {
 					noMoves = false;
 					// printMoveValues();
-					int[] n = bestMove(nodes);
+					//int[] n = bestMove(nodes);
+					/*
+					for(int i = 0; i < numTabs; i++){
+						System.out.print(' ');
+					}
+					System.out.println("*computer* moves to: " + n[1] + ", " + n[0]);*/
+					boolean corner = false;
+					Node cornerNode = null;
+					int[] n = new int[2];
+
+					for (int i = 0; i < nodes.size(); i++) {
+						if ((nodes.get(i).Y == 7) || (nodes.get(i).Y == 0))
+							if ((nodes.get(i).X == 7) || (nodes.get(i).X == 0)) {
+								corner = true;
+								cornerNode = nodes.get(i);
+							}
+					}
+					// printMoveValues();
+					
+					if (corner) {
+						n[0] = cornerNode.X;
+						n[1] = cornerNode.Y;
+					} else {
+						n = bestMove(nodes);
+					}	
 					board[n[0]][n[1]] = 2;
 					doFlip(turn, n[0], n[1]);
 					turn++;
 				}
 			}
+			numTabs++;
 		}
-
 		// count who won if the board is full
-		return howMany(2) - howMany(1);
+		winValue = howMany(2) - howMany(1);
+
+		System.out.printf("game #%d winValue: %d\n", gameNum, winValue);
 	}
 
 	/*
 	 * bestMove - traverses the 2D array, recording the coordinates of the best
 	 * valued position
 	 */
-	private static int[] bestMove(ArrayList<Node> possMoves) {
+	private int[] bestMove(ArrayList<Node> possMoves) {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y;
-		int val = moveValues[y][x];
+		int frontiers = numOfEmptyAdj(turn%2+1);
+		int val = moveValues[y][x] - frontiers;
+		// Need to make this "frontiers" value be calculated for each possible move
+		// so that number of frontier spaces are compared across different moves
 
 		for (int i = 1; i < possMoves.size(); i++) {
-			if (val < moveValues[possMoves.get(i).Y][possMoves.get(i).X]) {
-				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
+			if (val < (moveValues[possMoves.get(i).Y][possMoves.get(i).X]) - frontiers) {
+				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X] - frontiers;
 				x = possMoves.get(i).X;
 				y = possMoves.get(i).Y;
 			}
@@ -88,7 +140,7 @@ public class Game {
 	 * validMove - identifies if a provided (x,y) coordinate is a valid position
 	 * to place a tile
 	 */
-	private static boolean validMove(int x, int y, ArrayList<Node> possMoves) {
+	private boolean validMove(int x, int y, ArrayList<Node> possMoves) {
 		for (int i = 0; i < possMoves.size(); i++) {
 			if (possMoves.get(i).X == x && possMoves.get(i).Y == y)
 				return true;
@@ -99,7 +151,7 @@ public class Game {
 	/*
 	 * howMany - what the fuck is wrong with Anis
 	 */
-	private static int howMany(int a) {
+	private int howMany(int a) {
 		int answer = 0;
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
@@ -113,33 +165,73 @@ public class Game {
 	/*
 	 * numOfEmptyAdj - Returns the number of adjancent tiles of a given player
 	 */
-	private static int numOfEmptyAdj(int a) {
+	private int numOfEmptyAdj(int a) {
+		int[][] tempBoard = copyBoard(board);
 		ArrayList<Node> myPieces = whereAreMyPieces(a);
 		int answer = 0;
 		for (int i = 0; i < myPieces.size(); i++) {
-			int tempX = myPieces.get(i).Y;
-			int tempY = myPieces.get(i).X;
+			int tempX = myPieces.get(i).X;
+			int tempY = myPieces.get(i).Y;
 			if (tempX > 0) {
-				if (board[tempX-1][tempY+0] == 0) answer++; // check west
-				if (tempY > 0) if (board[tempX-1][tempY+1] == 0) answer++; // check northwest
-				if (tempY < 7) if (board[tempX-1][tempY-1] == 0) answer++; // check southwest
+				if (tempBoard[tempX-1][tempY+0] == 0) {
+					tempBoard[tempX-1][tempY+0] = 5;
+					answer++;
+				} // check west
+				if (tempY < 7)
+					if (tempBoard[tempX-1][tempY+1] == 0) {
+						tempBoard[tempX-1][tempY+1] = 5;
+						answer++;
+					} // check southwest
+				if (tempY > 0)
+					if (tempBoard[tempX-1][tempY-1] == 0) {
+						tempBoard[tempX-1][tempY-1] = 5;
+						answer++;
+					} // check northwest
 			}
 			if (tempX < 7) {
-				if (tempY > 0) if (board[tempX+1][tempY+1] == 0) answer++;	// check northeast
-				if (board[tempX+1][tempY+0] == 0) answer++;	// check east
-				if (tempY < 7) if (board[tempX+1][tempY-1] == 0) answer++; // check southeast
+				if (tempY < 7)
+					if (tempBoard[tempX+1][tempY+1] == 0) {
+						tempBoard[tempX+1][tempY+1] = 5;
+						answer++;
+					}	// check southeast
+				if (tempBoard[tempX+1][tempY+0] == 0) {
+					tempBoard[tempX+1][tempY+0] = 5;
+					answer++;
+				}	// check east
+				if (tempY > 0)
+					if (tempBoard[tempX+1][tempY-1] == 0) {
+						tempBoard[tempX+1][tempY-1] = 5;
+						answer++;
+					} // check northeast
 			}
-			if (tempY > 0) if (board[tempX+0][tempY+1] == 0) answer++; // check north
-			if (tempY < 7) if (board[tempX+0][tempY-1] == 0) answer++; // check south
-				
+			if (tempY < 7)
+				if (tempBoard[tempX+0][tempY+1] == 0) {
+					tempBoard[tempX+0][tempY+1] = 5;
+					answer++;
+				} // check south
+			if (tempY > 0)
+				if (tempBoard[tempX+0][tempY-1] == 0) {
+					tempBoard[tempX+0][tempY-1] = 5;
+					answer++;
+				} // check north
 		}
 		return answer;
 	}
 
+	/*Deep copy of the board, just to keep the global board safe from African danger and other unwanted changes.*/
+	private int[][] copyBoard(int[][] board)	 {
+		int [][] a = new int [board.length][board[0].length];
+		for(int i=0;i<board.length;i++)
+			for (int j=0;j<board.length;j++)
+				a[i][j]= board[i][j];
+		return a;
+	}
+
+
 	/*
 	 * whereAreMyPieces - returns the coordinates of a player's pieces
 	 */
-	private static ArrayList<Node> whereAreMyPieces(int a) {
+	private ArrayList<Node> whereAreMyPieces(int a) {
 		ArrayList<Node> myPieces = new ArrayList<Node>();
 		for (int i = 0; i < board.length; i++)
 			for (int j = 0; j < board[0].length; j++)
@@ -153,7 +245,7 @@ public class Game {
 	/*
 	 * doFlip - flips all pieces that were effected by a move
 	 */
-	private static void doFlip(int turn, int newx, int newy) {
+	private void doFlip(int turn, int newx, int newy) {
 		flipCheck(turn, newx, newy, -1, 0); // Checks west
 		flipCheck(turn, newx, newy, -1, 1); // Checks north-west
 		flipCheck(turn, newx, newy, 0, 1); // Checks north
@@ -167,7 +259,7 @@ public class Game {
 	/*
 	 * flipCheck - actually flips the tiles in a specific direction
 	 */
-	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
+	private boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry) {
 		int player, oppositePlayer;
 		int currentx = newx;
@@ -206,7 +298,7 @@ public class Game {
 	 * if that tile represents a valid move for the team moving on the current
 	 * turn. dirX, dirY should be {-1, 0, 1}, but should never BOTH be zero.
 	 */
-	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
+	public boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
 		// define who attacking and defending players are based on turn
 		if (turn % 2 == 0) {
@@ -241,7 +333,7 @@ public class Game {
 	 * color tiles using -1, 0, and 1 as possible directions to check. Calls
 	 * CanFlip. NOTE: this probably doesn't actually work.
 	 */
-	public static boolean Legal(int X, int Y) {
+	public boolean Legal(int X, int Y) {
 		int i, j, captures;
 		captures = 0;
 		if (board[X][Y] != 0)
@@ -259,7 +351,7 @@ public class Game {
 	 * allNextMoves - traverses the entire array. Calls Legal on each to
 	 * generate valid move spaces.
 	 */
-	public static ArrayList<Node> allNextMoves() {
+	public ArrayList<Node> allNextMoves() {
 		ArrayList<Node> nextMoves = new ArrayList<Node>();
 		for (int i = 0; i < board.length; i++)
 			for (int j = 0; j < board[0].length; j++)
