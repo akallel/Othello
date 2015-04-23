@@ -116,6 +116,7 @@ public class main {
 
 					System.out.println("Computer moves to: (" + n[1] + ","
 							+ n[0] + ")");
+
 					board[n[0]][n[1]] = 2;
 					doFlip(turn, n[0], n[1]);
 					turn++;
@@ -131,8 +132,13 @@ public class main {
 			System.out.println("Player 2 wins");
 		else
 			System.out.println("Draw game");
+		
+		System.out.println();
+		System.out.println("player 1 has "+ howMany(1) + " tiles");
+		System.out.println("player 2 has "+ howMany(2) + " tiles");
+
 	}
-	
+
 	/* move - creates a new board with a potential computer move
 	 * 
 	 */
@@ -144,7 +150,7 @@ public class main {
 			}
 		}
 		
-		newBoard[n.Y][n.X] = 2;
+		newBoard[n.Y][n.X] = 1;
 
 		// flip the resulting changed tiles
 		doFlip(turn, n.Y, n.X, newBoard);
@@ -429,6 +435,17 @@ public class main {
 		}
 	}
 
+	/* printTable - not sure why we have specific methods to print two identically-sized
+	 * 2D arrays... but oh well. "Memory is cheap" - Ted
+	 * 
+	 */
+	private static void printTable(int[] leafResults) {
+		for (int i = 0; i < leafResults.length; i++) {
+			System.out.print(leafResults[i]+ "  ");
+		}
+		System.out.println();
+	}
+	
 	/* initializeTable - creates the initial playing board
 	 * 
 	 */
@@ -558,4 +575,5 @@ public class main {
 			System.out.println();
 		}
 	}
+
 }
