@@ -18,9 +18,9 @@ public class main {
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
 		printTable();
-		
+
 		while (!gameOver) { // not the only stopping condition,
-										// other cases
+							// other cases
 			// where all are 1s or 2s should be included
 			int n1 = 0, n2 = 0;
 
@@ -30,7 +30,7 @@ public class main {
 				if (nodes.isEmpty()) {
 					System.out.println("NO MOVES AVAILABLE FOR USER.");
 					turn++;
-					if(noMoves == true)
+					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
 				} else {
@@ -73,11 +73,12 @@ public class main {
 				if (nodes.isEmpty()) {
 					System.out.println("NO MOVES AVAILABLE FOR COMPUTER.");
 					turn++;
-					if(noMoves == true)
+					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
 				} else {
 					noMoves = false;
+
 					System.out.println("Your options for player "
 								+ (turn % 2 + 1) + " are: " + nodes.toString());
 					boolean corner = false;
@@ -116,7 +117,6 @@ public class main {
 
 					System.out.println("Computer moves to: (" + n[1] + ","
 							+ n[0] + ")");
-
 					board[n[0]][n[1]] = 2;
 					doFlip(turn, n[0], n[1]);
 					turn++;
@@ -124,54 +124,60 @@ public class main {
 				}
 			}
 		}
-
 		// count who won if the board is full
-		if (howMany(1) > howMany(2))
+		if (howMany(1) > howMany(2)){
 			System.out.println("Player 1 wins");
-		else if (howMany(1) < howMany(2))
+			System.out.println("Player 1" + howMany(1) );
+			System.out.println("Player 2" + howMany(2) );
+			}
+		else if (howMany(1) < howMany(2)){
 			System.out.println("Player 2 wins");
+			System.out.println("Player 1" + howMany(1) );
+			System.out.println("Player 2" + howMany(2) );
+			}
 		else
 			System.out.println("Draw game");
-		
+
 		System.out.println();
 		System.out.println("player 1 has "+ howMany(1) + " tiles");
 		System.out.println("player 2 has "+ howMany(2) + " tiles");
-
 	}
 
-	/* move - creates a new board with a potential computer move
-	 * 
+	/*
+	 * move - creates a new board with a potential computer move
 	 */
-	public static int[][] move(Node n){
+	public static int[][] move(Node n) {
 		int[][] newBoard = new int[8][8];
-		for(int i = 0; i < board.length; i++){
-			for(int j = 0; j < board[i].length; j++){
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
 				newBoard[i][j] = board[i][j];
 			}
 		}
-		
-		newBoard[n.Y][n.X] = 1;
+
+		newBoard[n.Y][n.X] = 2;
 
 		// flip the resulting changed tiles
 		doFlip(turn, n.Y, n.X, newBoard);
 		return newBoard;
 	}
 
-	/* bestMove - traverses the 2D array, recording the coordinates of the best valued position
-	 * 
+	/*
+	 * bestMove - traverses the 2D array, recording the coordinates of the best
+	 * valued position
 	 */
 	private static int bestMove(int[] leafResults) {
 		int index = 0;
-		for(int i = 1; i < leafResults.length; i++){
-			if(leafResults[i] > leafResults[index]){
+		for (int i = 1; i < leafResults.length; i++) {
+			if (leafResults[i] > leafResults[index]) {
 				index = i;
 			}
 		}
 		return index;
 	}
-	
-	/* validMove - identifies if a provided (x,y) coordinate is a valid position to place a tile
-	 * 
+
+	/*
+	 * validMove - identifies if a provided (x,y) coordinate is a valid position
+	 * to place a tile
 	 */
 	private static boolean validMove(int x, int y, ArrayList<Node> possMoves) {
 		for (int i = 0; i < possMoves.size(); i++) {
@@ -180,9 +186,9 @@ public class main {
 		}
 		return false;
 	}
-	
-	/* howMany - what the fuck is wrong with Anis
-	 * 
+
+	/*
+	 * howMany - what the fuck is wrong with Anis
 	 */
 	private static int howMany(int a) {
 		int answer = 0;
@@ -300,7 +306,8 @@ public class main {
 		flipCheck(turn, newx, newy, -1, -1, board); // Checks south
 	}
 
-	/* flipCheck - actually flips the tiles in a specific direction
+	/*
+	 * flipCheck - actually flips the tiles in a specific direction
 	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry, int[][] board) {
@@ -335,9 +342,9 @@ public class main {
 
 		return false;
 	}
-	
-	/* doFlip - flips all pieces that were effected by a move
-	 * 
+
+	/*
+	 * doFlip - flips all pieces that were effected by a move
 	 */
 	private static void doFlip(int turn, int newx, int newy) {
 		flipCheck(turn, newx, newy, -1, 0); // Checks west
@@ -350,7 +357,8 @@ public class main {
 		flipCheck(turn, newx, newy, -1, -1); // Checks south
 	}
 
-	/* flipCheck - actually flips the tiles in a specific direction
+	/*
+	 * flipCheck - actually flips the tiles in a specific direction
 	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry) {
@@ -386,9 +394,9 @@ public class main {
 		return false;
 	}
 
-	/* printTable - not sure why we have specific methods to print two identically-sized
-	 * 2D arrays... but oh well. "Memory is cheap" - Ted
-	 * 
+	/*
+	 * printTable - not sure why we have specific methods to print two
+	 * identically-sized 2D arrays... but oh well. "Memory is cheap" - Ted
 	 */
 	private static void printTable() {
 		for (int i = 0; i < board.length; i++) {
@@ -435,19 +443,8 @@ public class main {
 		}
 	}
 
-	/* printTable - not sure why we have specific methods to print two identically-sized
-	 * 2D arrays... but oh well. "Memory is cheap" - Ted
-	 * 
-	 */
-	private static void printTable(int[] leafResults) {
-		for (int i = 0; i < leafResults.length; i++) {
-			System.out.print(leafResults[i]+ "  ");
-		}
-		System.out.println();
-	}
-	
-	/* initializeTable - creates the initial playing board
-	 * 
+	/*
+	 * initializeTable - creates the initial playing board
 	 */
 	public static void initializeTable(int[][] a) {
 		for (int i = 0; i < a.length; i++)
@@ -529,24 +526,28 @@ public class main {
 		return nextMoves;
 	}
 
-	/* shittyHeuristic - a rough, initial heuristic that simply
-	 * prioritizes corners > edges > inner rings
-	 * 
+	/*
+	 * shittyHeuristic - a rough, initial heuristic that simply prioritizes
+	 * corners > edges > inner rings
 	 */
 	public static void shittyHeuristic() {
-		int[][] shit = {{20, -3, 11, 8, 8, 11, -3, 20},
-				{-3, -7, -4, 1, 1, -4, -7, -3},
-				{11, -4, 2, 2, 2, 2, -4, 11},
-				{8, 1, 2, -3, -3, 2, 1, 8},
-				{8, 1, 2, -3, -3, 2, 1, 8},
-				{11, -4, 2, 2, 2, 2, -4, 11},
-				{-3, -7, -4, 1, 1, -4, -7, -3},
-				{20, -3, 11, 8, 8, 11, -3, 20}};
+		int[][] shit = 
+			{
+				{ 20, -3, 11, 8, 8, 11, -3, 20 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 11, -4, 2, 2, 2, 2, -4, 11 }, 
+				{ 8, 1, 2, -3, -3, 2, 1, 8 },
+				{ 8, 1, 2, -3, -3, 2, 1, 8 }, 
+				{ 11, -4, 2, 2, 2, 2, -4, 11 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 20, -3, 11, 8, 8, 11, -3, 20 } 
+			};
 		moveValues = shit;
 	}
 
-	/* refreshMoveValues - refreshes every position in the parallel moveValues array to zero
-	 * 
+	/*
+	 * refreshMoveValues - refreshes every position in the parallel moveValues
+	 * array to zero
 	 */
 	public static void refreshMoveValues() {
 		for (int i = 0; i < moveValues.length; i++) {
@@ -556,8 +557,8 @@ public class main {
 		}
 	}
 
-	/* printMoveValues - prints out the 2D array of move values
-	 * 
+	/*
+	 * printMoveValues - prints out the 2D array of move values
 	 */
 	private static void printMoveValues() {
 		for (int i = 0; i < moveValues.length; i++) {
@@ -575,5 +576,4 @@ public class main {
 			System.out.println();
 		}
 	}
-
 }

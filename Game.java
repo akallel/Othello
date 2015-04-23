@@ -37,7 +37,9 @@ public class Game {
 					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
+					//System.out.println("No moves for *human*");
 				} else {
+					
 					noMoves = false;
 					boolean corner = false;
 					Node cornerNode = null;
@@ -107,12 +109,27 @@ public class Game {
 			}
 			numTabs++;
 		}
+
 		// count who won if the board is full
 		winValue = howMany(2) - howMany(1);
 
 		System.out.printf("game #%d winValue: %d\n", gameNum, winValue);
 	}
-
+	
+	/*
+	 * bestMove - traverses the 2D array, recording the coordinates of the best
+	 * valued position
+	 */
+	private static int bestMove(int[] leafResults) {
+		int index = 0;
+		for (int i = 1; i < leafResults.length; i++) {
+			if (leafResults[i] > leafResults[index]) {
+				index = i;
+			}
+		}
+		return index;
+	}
+	
 	/*
 	 * bestMove - traverses the 2D array, recording the coordinates of the best
 	 * valued position
