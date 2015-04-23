@@ -20,7 +20,7 @@ public class Game2 {
 
 	public Game2(int[][] board, int turn, boolean noMoves, boolean gameOver) {
 		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board.length; j++) {
+			for (int j = 0; j < board[0].length; j++) {
 				board2[i][j] = board[i][j];
 			}
 		}
@@ -29,7 +29,7 @@ public class Game2 {
 		this.gameOver = gameOver;
 	}
 	
-	public static int play(){
+	public int play(){
 		while (!gameOver) {
 			if (turn % 2 == 0) {
 				ArrayList<Node> nodes = allNextMoves();
@@ -42,8 +42,8 @@ public class Game2 {
 					noMoves = false;
 					// printMoveValues();
 					int[] n = bestMove(nodes);
-					board2[n[0]][n[1]] = 1; // player ONE!!!
-					doFlip(turn, n[0], n[1]);
+					board2[n[0]][n[1]] = 1;
+					doFlip(turn, n[0], n[1]) ;
 					turn++;
 				}
 			} else {
@@ -59,31 +59,60 @@ public class Game2 {
 					noMoves = false;
 					// printMoveValues();
 					int[] n = bestMove(nodes);
-					board2[n[0]][n[1]] = 2;
-					doFlip(turn, n[0], n[1]);
+					//board2[n[0]][n[1]] = 2;
+					//doFlip(turn, n[0], n[1]);*/
+					alphaBeta(new Node(n[0],n[1]), turn, Integer.MIN_VALUE, Integer.MAX_VALUE,true);
 					turn++;
 				}
 			}
 		}
+		shittyHeuristic();
 		// count who won if the board is full
-		return howMany(2) 	- howMany(1);
+		return howMany(2) - howMany(1);
 	}
 
+	//alphabeta(origin, depth, -∞, +∞, TRUE)
+	
+	/*Alpha Beta pruning */
+	public static int alphaBeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer){	
+	   // int v=0;  
+		if (depth == 0) //or node is a terminal node
+	          return board2[node.X][node.Y];//the heuristic value of node
+	    if (maximizingPlayer){
+	    	int v = Integer.MIN_VALUE;
+			for (int i=0; i<allNextMoves().size();i++){
+	              v= Math.max(v, alphaBeta(allNextMoves().get(i), depth - 1, alpha, beta,false));
+	              alpha = Math.max(alpha, v);
+	             if (beta <= alpha)
+	                  break ;
+			}
+	          return v;
+	      }
+	      else{
+	         int v= Integer.MAX_VALUE;
+				for (int i=0; i<allNextMoves().size();i++){
+	              v = Math.min(v, alphaBeta(allNextMoves().get(i), depth - 1, alpha, beta, true));
+	              beta = Math.min(beta, v);
+	              if (beta <= alpha){
+	                 break;}
+				}
+	          return v;}
+	}
+	
 	/*
-	 * bestMove - traverses the 2D array, recording the coordinates of the best
 	 * valued position
 	 */
 	private static int[] bestMove(ArrayList<Node> possMoves) {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y; 
-		moveValues[y][x]= moveValues[y][x] + fakeGain(turn,board2, fakeFlip(turn, possMoves.get(0).X, possMoves.get(0).Y));
+		moveValues[y][x]= moveValues[y][x] + fakeGain(turn,board2, fakeFlip(turn, possMoves.get(0).Y, possMoves.get(0).X));
 		int val = moveValues[y][x];
 		
 		for (int i = 1; i < possMoves.size(); i++) {
 			//System.out.println(i+":   Fake gain is for : ("+ possMoves.get(i).Y + ","+ possMoves.get(i).X + ") is "+ fakeGain(turn,board, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X)));
 			moveValues[possMoves.get(i).Y][possMoves.get(i).X]= 
 					moveValues[possMoves.get(i).Y][possMoves.get(i).X] + fakeGain(turn,board2, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X));
-			if (val < moveValues[possMoves.get(i).Y][possMoves.get(i).X] )
+			if (val <= moveValues[possMoves.get(i).Y][possMoves.get(i).X] )
 			{
 				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
 				
@@ -99,6 +128,29 @@ public class Game2 {
 		return n;
 	}
 
+	private static int[] shittyMove(ArrayList<Node> possMoves) {
+		int x = possMoves.get(0).X;
+		int y = possMoves.get(0).Y; 
+		moveValues[y][x]= moveValues[y][x] ;
+		int val = moveValues[y][x];
+		
+		for (int i = 1; i < possMoves.size(); i++) {
+			//System.out.println(i+":   Fake gain is for : ("+ possMoves.get(i).Y + ","+ possMoves.get(i).X + ") is "+ fakeGain(turn,board, fakeFlip(turn, possMoves.get(i).Y, possMoves.get(i).X)));
+			if (val < moveValues[possMoves.get(i).Y][possMoves.get(i).X] )
+			{
+				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X];
+				
+				x = possMoves.get(i).X;
+				y = possMoves.get(i).Y;
+			}
+		}
+		//System.out.println("The best value for turn is "+val);
+		int[] n = {x, y};
+		//printTable(moveValues);
+		//rest after each move to only change the possible next moves.
+		//shittyHeuristic();
+		return n;
+	}
 	/* printTable - not sure why we have specific methods to print two identically-sized
 	 * 2D arrays... but oh well. "Memory is cheap" - Ted
 	 * 
@@ -165,8 +217,14 @@ public class Game2 {
 	 * Probably not exactly right, but the difference of howmanyfake and howmany would give mostly 0 and that doesnt help. 
 	 * */
 	private static int fakeGain(int turn, int [][] board, int [][] fakeBoard){
-		if(turn%2 ==0) return Math.max(howManyFake(fakeBoard,1),howMany(1));
-		else return Math.max(howManyFake(fakeBoard,2),howMany(2));
+		if(turn%2 ==0) {
+			//System.out.println("Faaake gain !! "+ (howManyFake(fakeBoard,1)-howMany(1)));
+			return Math.max(howManyFake(fakeBoard,1),howMany(1));
+		}
+		else {
+			//System.out.println("Faaake gain 2 !! "+ (howManyFake(fakeBoard,2)-howMany(2)));
+			return Math.max(howManyFake(fakeBoard,2),howMany(2));
+		}
 	}
 	
 	// basically creates a fake board without messing with the actual board
@@ -344,6 +402,17 @@ public class Game2 {
 		ArrayList<Node> nextMoves = new ArrayList<Node>();
 		for (int i = 0; i < board2.length; i++)
 			for (int j = 0; j < board2[0].length; j++)
+				if (Legal(i, j)) {
+					Node newNode = new Node(i, j);
+					nextMoves.add(newNode);
+				}
+		return nextMoves;
+	}
+	
+	public static ArrayList<Node> allNextMoves(int[][]a) {
+		ArrayList<Node> nextMoves = new ArrayList<Node>();
+		for (int i = 0; i < a.length; i++)
+			for (int j = 0; j < a[0].length; j++)
 				if (Legal(i, j)) {
 					Node newNode = new Node(i, j);
 					nextMoves.add(newNode);
