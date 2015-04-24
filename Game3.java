@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Game3{
 	int turn;
-	int value;
+	int worstValue;
 	public Game3(int[][] board, int turn, boolean noMoves, boolean gameOver, int depth){
 		this.turn = turn;
 		//if the depth is > 0, we want to call Game3 on all of our children
@@ -13,7 +13,8 @@ public class Game3{
 			Game3[] branchPlays = new Game3[branches.size()];
 			for(int i = 0; i < branches.size(); i++){
 				branchPlays[i] = new Game3(move(branches.get(i), board), turn, noMoves, gameOver, depth - 1);
-				value += branchPlays[i].value;
+				if(branchPlays[i].worstValue > worstValue)
+					worstValue = branchPlays[i].worstValue;
 			}
 		} //if the depth is 0, we want to call Game on all of our children
 		else{
@@ -21,7 +22,8 @@ public class Game3{
 			Game[] branchPlays = new Game[branches.size()];
 			for(int i = 0; i < branches.size(); i++){
 				branchPlays[i] = new Game(move(branches.get(i), board), turn, noMoves, gameOver);
-				value += branchPlays[i].winValue;
+				if(branchPlays[i].winValue > worstValue)
+					worstValue = branchPlays[i].winValue;
 			}
 		}
 		

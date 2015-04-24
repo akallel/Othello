@@ -13,7 +13,7 @@ public class main {
 	static int turn = 0;
 	static boolean noMoves = false;
 	static boolean gameOver = false;
-	static int DEPTH = 3;
+	static int DEPTH = 2;
 
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
@@ -79,22 +79,6 @@ public class main {
 					noMoves = true;
 				} else {
 					noMoves = false;
-<<<<<<< HEAD
-					Game[] leaves = new Game[nodes.size()];
-					for(int i = 0; i < leaves.length; i++){
-						leaves[i] = new Game(move(nodes.get(i)), turn + 1, noMoves, gameOver);
-					}
-					
-					int[] leafResults = new int[leaves.length];
-					for(int i = 0; i < leafResults.length; i++){
-						leafResults[i] = leaves[i].play();
-						System.out.println(leafResults[i]);
-					}
-					
-					int bestMove = bestMove(leafResults);
-					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
-					System.out.println("Best Move for computer: " + bestMove);
-=======
 
 					System.out.println("Your options for player "
 								+ (turn % 2 + 1) + " are: " + nodes.toString());
@@ -125,18 +109,20 @@ public class main {
 						}
 
 						int[] leafResults = new int[leaves.length];
+						int miniMax = 0;
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = leaves[i].value;
+							leafResults[i] = leaves[i].worstValue;
 							// System.out.println("Value: " + leafResults[i] +
 							// " " + leaves[i].winValue);
+							if(leafResults[i] > leafResults[miniMax])
+								miniMax = i;
 						}
 
-						int bestMove = bestMove(leafResults);
-						n[0] = nodes.get(bestMove).X;
-						n[1] = nodes.get(bestMove).Y;
+						//int bestMove = bestMove(leafResults);
+						n[0] = nodes.get(miniMax).X;
+						n[1] = nodes.get(miniMax).Y;
 					}
 
->>>>>>> john
 					System.out.println("Computer moves to: (" + n[1] + ","
 							+ n[0] + ")");
 					board[n[0]][n[1]] = 2;
@@ -175,15 +161,11 @@ public class main {
 				newBoard[i][j] = board[i][j];
 			}
 		}
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> john
 		newBoard[n.Y][n.X] = 2;
 
 		// flip the resulting changed tiles
-		doFlip(turn, n.X, n.Y, newBoard);
+		doFlip(turn, n.Y, n.X, newBoard);
 		return newBoard;
 	}
 
