@@ -4,50 +4,81 @@ import java.util.Scanner;
 
 /*java checks for nqueens : http://www.codeshare.io/KExMg*/
 public class main {
+	// color values (for prettiness!)
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
 	public static final String ANSI_RED = "\u001B[31m";
 	public static final String ANSI_GREEN = "\u001B[32m";
+	
+	//our board, recording placements of tiles for both players
 	static int[][] board = new int[8][8];
+	
+	//our value assessor, a legacy from an earlier time
 	static int[][] moveValues = new int[8][8];
+	
+	//turn counter (odd = player 1, even = player 2)
 	static int turn = 0;
+	
+	//our end-game checker; if we can't move, we set noMoves to false. If noMoves if already false, we're in a deadlock
+	//between both players and the game is over since *nobody* can move.
 	static boolean noMoves = false;
 	static boolean gameOver = false;
+	
+	//the depth of our minimax/alpha-beta algorithm. The actual depth is DEPTH + 1, because of our treatment of leaf nodes.
 	static int DEPTH = 2;
 
+	
+	/* main - runs the game.
+	 * 
+	 */
 	public static void main(String[] args) {
+		//create a scanner, initialize the board in the starting state, and print it out
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
 		printTable();
 
-		while (!gameOver) { // not the only stopping condition,
-							// other cases
-			// where all are 1s or 2s should be included
+		//if gameOver is true, both players can't move and the game is over
+		while (!gameOver) { 
+			
+			// values to store player input x and y values
 			int n1 = 0, n2 = 0;
 
+			//check  whose turn it is
 			if (turn % 2 == 0) {
 				// player 1 moves
 				ArrayList<Node> nodes = allNextMoves();
+				
+				//check if there's an available move for player 1
 				if (nodes.isEmpty()) {
+					//alert the player
 					System.out.println("NO MOVES AVAILABLE FOR USER.");
+					//increment the turn
 					turn++;
+					//if noMoves is already true, the game is over because neither player can move
 					if (noMoves == true)
 						gameOver = true;
+					//otherwise, indicate that the current player can't move
 					noMoves = true;
 				} else {
+					//if the player can move, record that a movement is occurring
 					noMoves = false;
-					// prints out the valid moves for the non-computer player.
-					// continues to prompt for a move until a valid move is
-					// supplied.
+					// string to store player input
 					String a;
 					do {
+						//clear the string (in case we're restarting from a failed player move entry)
 						a = "";
+						//print out the player's options
 						System.out.println("Your options for player "
 								+ (turn % 2 + 1) + " are: " + nodes.toString());
 						System.out.println("choose coordinates a,b");
+						
+						//read in player input
 						a = scan.next();
+						
+						// check if the input string is the correct format
 						if (a.matches("^[0-9]+(,[0-9]+)")) {
 							String[] aa = a.split(",");
+							//parse the input string into two integers for movement
 							n2 = Integer.parseInt(aa[0]);
 							n1 = Integer.parseInt(aa[1]);
 						}
@@ -68,70 +99,100 @@ public class main {
 					printTable();
 				}
 			} else {
-				// player 2 moves
+				// all our potential player 2 moves are stored within nodes
 				ArrayList<Node> nodes = allNextMoves();
-				// printTable();
+				
+				// if player 2 has no moves
 				if (nodes.isEmpty()) {
+					// alert the player that player 2 can't move
 					System.out.println("NO MOVES AVAILABLE FOR COMPUTER.");
+					
+					//increment the turn
 					turn++;
+					
+					//check if we're in a deadlock; if so, end the game by setting gameOver to true
 					if (noMoves == true)
 						gameOver = true;
+					
+					//set noMoves to true to indicate that no movement was made
 					noMoves = true;
 				} else {
+					//otherwise,
+					//indicate that a movement was made
 					noMoves = false;
 
-					System.out.println("Your options for player "
-								+ (turn % 2 + 1) + " are: " + nodes.toString());
+					//set corner to false (we haven't identified if we can move to a corner yet
 					boolean corner = false;
+					
+					//temporary storage for a potential corner node
 					Node cornerNode = null;
+					
+					//our storage array for computer moves
 					int[] n = new int[2];
 
 					//check if there's a corner available: if so, we want to take it.
 					for (int i = 0; i < nodes.size(); i++) {
 						if ((nodes.get(i).Y == 7) || (nodes.get(i).Y == 0))
 							if ((nodes.get(i).X == 7) || (nodes.get(i).X == 0)) {
+								//if we find a corner, mark corner as true and save the node in temporary node storage
 								corner = true;
 								cornerNode = nodes.get(i);
 							}
 					}
-					//take the corner
+					
+					//take the corner if possible
 					if (corner) {
+						//the n array stores our chosen move's x and y coordinates
 						n[0] = cornerNode.X;
 						n[1] = cornerNode.Y;
 						
 					//otherwise, choose the best possible move according to our minimax
 					} else {
+						
+						//create an array of Game3s to store our potential movements
 						Game3[] leaves = new Game3[nodes.size()];
+						
+						//traverse the node list, creating a new Game3 for each
 						for (int i = 0; i < leaves.length; i++) {
+							//Game3 will branch to the designated depth (+ 1) and evaluate the worst value in each branch
 							leaves[i] = new Game3(move(nodes.get(i)), turn + 1,
 									noMoves, gameOver, DEPTH);
-							// System.out.println(nodes.get(i));
 						}
 
+						// store the leaf results in the leafResult integer array
 						int[] leafResults = new int[leaves.length];
+						
+						// miniMax stores our chosen leaf index within the leaf array
 						int miniMax = 0;
+						
+						// find the best value of our possible choices (mind you, these record their worst value - hence the minimax)
 						for (int i = 0; i < leaves.length; i++) {
 							leafResults[i] = leaves[i].worstValue;
-							// System.out.println("Value: " + leafResults[i] +
-							// " " + leaves[i].winValue);
 							if(leafResults[i] > leafResults[miniMax])
 								miniMax = i;
 						}
 
-						//int bestMove = bestMove(leafResults);
+						//record the chosen values within the n array
 						n[0] = nodes.get(miniMax).X;
 						n[1] = nodes.get(miniMax).Y;
 					}
 
+					//print out the chosen computer move
 					System.out.println("Computer moves to: (" + n[1] + ","
 							+ n[0] + ")");
+					
+					//change that spot to the computer tile value
 					board[n[0]][n[1]] = 2;
+					//execute a flip of adjacent tiles as per Othello rules
 					doFlip(turn, n[0], n[1]);
+					//increment the turn
 					turn++;
+					//print the resulting table
 					printTable();
 				}
 			}
 		}
+		
 		// count who won if the board is full
 		if (howMany(1) > howMany(2)){
 			System.out.println("Player 1 wins");
