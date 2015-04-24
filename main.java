@@ -10,18 +10,18 @@ public class main {
 	public static final String ANSI_GREEN = "\u001B[32m";
 	static int[][] board = new int[8][8];
 	static int[][] moveValues = new int[8][8];
-	static int turn = 0, TRUE = 1, FALSE = 0;
+	static int turn = 0;
 	static boolean noMoves = false;
 	static boolean gameOver = false;
+	static int DEPTH = 3;
 
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
 		printTable();
-		
 
 		while (!gameOver) { // not the only stopping condition,
-										// other cases
+							// other cases
 			// where all are 1s or 2s should be included
 			int n1 = 0, n2 = 0;
 
@@ -31,7 +31,7 @@ public class main {
 				if (nodes.isEmpty()) {
 					System.out.println("NO MOVES AVAILABLE FOR USER.");
 					turn++;
-					if(noMoves == true)
+					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
 				} else {
@@ -39,14 +39,18 @@ public class main {
 					// prints out the valid moves for the non-computer player.
 					// continues to prompt for a move until a valid move is
 					// supplied.
+					String a;
 					do {
+						a = "";
 						System.out.println("Your options for player "
 								+ (turn % 2 + 1) + " are: " + nodes.toString());
 						System.out.println("choose coordinates a,b");
-						String a = scan.next();
-						String[] aa = a.split(",");
-						n2 = Integer.parseInt(aa[0]);
-						n1 = Integer.parseInt(aa[1]);
+						a = scan.next();
+						if (a.matches("^[0-9]+(,[0-9]+)")) {
+							String[] aa = a.split(",");
+							n2 = Integer.parseInt(aa[0]);
+							n1 = Integer.parseInt(aa[1]);
+						}
 					} while (!validMove(n1, n2, nodes));
 
 					// once we've determined that the player has selected a
@@ -70,11 +74,12 @@ public class main {
 				if (nodes.isEmpty()) {
 					System.out.println("NO MOVES AVAILABLE FOR COMPUTER.");
 					turn++;
-					if(noMoves == true)
+					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
 				} else {
 					noMoves = false;
+<<<<<<< HEAD
 					Game[] leaves = new Game[nodes.size()];
 					for(int i = 0; i < leaves.length; i++){
 						leaves[i] = new Game(move(nodes.get(i)), turn + 1, noMoves, gameOver);
@@ -89,6 +94,49 @@ public class main {
 					int bestMove = bestMove(leafResults);
 					int[] n = {nodes.get(bestMove).X, nodes.get(bestMove).Y};
 					System.out.println("Best Move for computer: " + bestMove);
+=======
+
+					System.out.println("Your options for player "
+								+ (turn % 2 + 1) + " are: " + nodes.toString());
+					boolean corner = false;
+					Node cornerNode = null;
+					int[] n = new int[2];
+
+					//check if there's a corner available: if so, we want to take it.
+					for (int i = 0; i < nodes.size(); i++) {
+						if ((nodes.get(i).Y == 7) || (nodes.get(i).Y == 0))
+							if ((nodes.get(i).X == 7) || (nodes.get(i).X == 0)) {
+								corner = true;
+								cornerNode = nodes.get(i);
+							}
+					}
+					//take the corner
+					if (corner) {
+						n[0] = cornerNode.X;
+						n[1] = cornerNode.Y;
+						
+					//otherwise, choose the best possible move according to our minimax
+					} else {
+						Game3[] leaves = new Game3[nodes.size()];
+						for (int i = 0; i < leaves.length; i++) {
+							leaves[i] = new Game3(move(nodes.get(i)), turn + 1,
+									noMoves, gameOver, DEPTH);
+							// System.out.println(nodes.get(i));
+						}
+
+						int[] leafResults = new int[leaves.length];
+						for (int i = 0; i < leaves.length; i++) {
+							leafResults[i] = leaves[i].value;
+							// System.out.println("Value: " + leafResults[i] +
+							// " " + leaves[i].winValue);
+						}
+
+						int bestMove = bestMove(leafResults);
+						n[0] = nodes.get(bestMove).X;
+						n[1] = nodes.get(bestMove).Y;
+					}
+
+>>>>>>> john
 					System.out.println("Computer moves to: (" + n[1] + ","
 							+ n[0] + ")");
 					board[n[0]][n[1]] = 2;
@@ -98,27 +146,40 @@ public class main {
 				}
 			}
 		}
-
 		// count who won if the board is full
-		if (howMany(1) > howMany(2))
+		if (howMany(1) > howMany(2)){
 			System.out.println("Player 1 wins");
-		else if (howMany(1) < howMany(2))
+			System.out.println("Player 1" + howMany(1) );
+			System.out.println("Player 2" + howMany(2) );
+			}
+		else if (howMany(1) < howMany(2)){
 			System.out.println("Player 2 wins");
+			System.out.println("Player 1" + howMany(1) );
+			System.out.println("Player 2" + howMany(2) );
+			}
 		else
 			System.out.println("Draw game");
+
+		System.out.println();
+		System.out.println("player 1 has "+ howMany(1) + " tiles");
+		System.out.println("player 2 has "+ howMany(2) + " tiles");
 	}
-	
-	/* move - creates a new board with a potential computer move
-	 * 
+
+	/*
+	 * move - creates a new board with a potential computer move
 	 */
-	public static int[][] move(Node n){
+	public static int[][] move(Node n) {
 		int[][] newBoard = new int[8][8];
-		for(int i = 0; i < board.length; i++){
-			for(int j = 0; j < board[i].length; j++){
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
 				newBoard[i][j] = board[i][j];
 			}
 		}
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> john
 		newBoard[n.Y][n.X] = 2;
 
 		// flip the resulting changed tiles
@@ -126,21 +187,23 @@ public class main {
 		return newBoard;
 	}
 
-	/* bestMove - traverses the 2D array, recording the coordinates of the best valued position
-	 * 
+	/*
+	 * bestMove - traverses the 2D array, recording the coordinates of the best
+	 * valued position
 	 */
 	private static int bestMove(int[] leafResults) {
 		int index = 0;
-		for(int i = 1; i < leafResults.length; i++){
-			if(leafResults[i] > leafResults[index]){
+		for (int i = 1; i < leafResults.length; i++) {
+			if (leafResults[i] > leafResults[index]) {
 				index = i;
 			}
 		}
 		return index;
 	}
-	
-	/* validMove - identifies if a provided (x,y) coordinate is a valid position to place a tile
-	 * 
+
+	/*
+	 * validMove - identifies if a provided (x,y) coordinate is a valid position
+	 * to place a tile
 	 */
 	private static boolean validMove(int x, int y, ArrayList<Node> possMoves) {
 		for (int i = 0; i < possMoves.size(); i++) {
@@ -149,9 +212,9 @@ public class main {
 		}
 		return false;
 	}
-	
-	/* howMany - what the fuck is wrong with Anis
-	 * 
+
+	/*
+	 * howMany - what the fuck is wrong with Anis
 	 */
 	private static int howMany(int a) {
 		int answer = 0;
@@ -162,6 +225,97 @@ public class main {
 			}
 		}
 		return answer;
+	}
+
+	/*
+	 * numOfEmptyAdj - Returns the number of adjancent tiles of a given player
+	 */
+	private static int numOfEmptyAdj(int a) {
+		int[][] tempBoard = copyBoard(board);
+		ArrayList<Node> myPieces = whereAreMyPieces(a);
+		int answer = 0;
+		for (int i = 0; i < myPieces.size(); i++) {
+			int tempX = myPieces.get(i).X;
+			int tempY = myPieces.get(i).Y;
+			if (tempX > 0) {
+				if (tempBoard[tempX-1][tempY+0] == 0) {
+					// System.out.printf("checked west: [%d, %d]\n", tempX-1, tempY+0);
+					tempBoard[tempX-1][tempY+0] = 5;
+					answer++;
+				} // check west
+				if (tempY < 7)
+					if (tempBoard[tempX-1][tempY+1] == 0) {
+						// System.out.println("checked southwest["+(tempX-1)+","+(tempY+1)+"]");
+						tempBoard[tempX-1][tempY+1] = 5;
+						answer++;
+					} // check southwest
+				if (tempY > 0)
+					if (tempBoard[tempX-1][tempY-1] == 0) {
+						// System.out.printf("checked northwest: [%d, %d]\n", tempX-1, tempY-1);
+						tempBoard[tempX-1][tempY-1] = 5;
+						answer++;
+					} // check northwest
+			}
+			if (tempX < 7) {
+				if (tempY < 7)
+					if (tempBoard[tempX+1][tempY+1] == 0) {
+						// System.out.printf("checked southeast: [%d, %d]\n", tempX+1, tempY+1);
+						tempBoard[tempX+1][tempY+1] = 5;
+						answer++;
+					}	// check southeast
+				if (tempBoard[tempX+1][tempY+0] == 0) {
+					// System.out.printf("checked east: [%d, %d]\n", tempX+1, tempY);
+					tempBoard[tempX+1][tempY+0] = 5;
+					answer++;
+				}	// check east
+				if (tempY > 0)
+					if (tempBoard[tempX+1][tempY-1] == 0) {
+						// System.out.printf("checked northeast: [%d, %d]\n", tempX+1, tempY-1);
+						tempBoard[tempX+1][tempY-1] = 5;
+						answer++;
+					} // check northeast
+			}
+			if (tempY < 7)
+				if (tempBoard[tempX+0][tempY+1] == 0) {
+					// System.out.printf("checked south: [%d, %d]\n", tempX, tempY+1);
+					tempBoard[tempX+0][tempY+1] = 5;
+					answer++;
+				} // check south
+			if (tempY > 0)
+				if (tempBoard[tempX+0][tempY-1] == 0) {
+					// System.out.printf("checked north: [%d, %d]\n", tempX, tempY-1);
+					tempBoard[tempX+0][tempY-1] = 5;
+					answer++;
+				} // check north
+			// printTable(tempBoard);
+		}
+		// System.out.println("Player " +(a)+ " has " +answer+ " number of empty adjancent tiles.");
+		return answer;
+	}
+
+	/*Deep copy of the board, just to keep the global board safe from African danger and other unwanted changes.*/
+	private static int[][] copyBoard(int[][] board)	 {
+		int [][] a = new int [board.length][board[0].length];
+		for(int i=0;i<board.length;i++)
+			for (int j=0;j<board.length;j++)
+				a[i][j]= board[i][j];
+		return a;
+	}
+
+
+	/*
+	 * whereAreMyPieces - returns the coordinates of a player's pieces
+	 */
+	private static ArrayList<Node> whereAreMyPieces(int a) {
+		ArrayList<Node> myPieces = new ArrayList<Node>();
+		for (int i = 0; i < board.length; i++)
+			for (int j = 0; j < board[0].length; j++)
+				if (board[i][j] == a) {
+					Node newNode = new Node(i, j);
+					myPieces.add(newNode);
+				}
+		System.out.println("my pieces are at: "+myPieces);
+		return myPieces;
 	}
 
 	/* doFlip - flips all pieces that were effected by a move
@@ -178,7 +332,8 @@ public class main {
 		flipCheck(turn, newx, newy, -1, -1, board); // Checks south
 	}
 
-	/* flipCheck - actually flips the tiles in a specific direction
+	/*
+	 * flipCheck - actually flips the tiles in a specific direction
 	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry, int[][] board) {
@@ -213,9 +368,9 @@ public class main {
 
 		return false;
 	}
-	
-	/* doFlip - flips all pieces that were effected by a move
-	 * 
+
+	/*
+	 * doFlip - flips all pieces that were effected by a move
 	 */
 	private static void doFlip(int turn, int newx, int newy) {
 		flipCheck(turn, newx, newy, -1, 0); // Checks west
@@ -228,7 +383,8 @@ public class main {
 		flipCheck(turn, newx, newy, -1, -1); // Checks south
 	}
 
-	/* flipCheck - actually flips the tiles in a specific direction
+	/*
+	 * flipCheck - actually flips the tiles in a specific direction
 	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry) {
@@ -264,9 +420,9 @@ public class main {
 		return false;
 	}
 
-	/* printTable - not sure why we have specific methods to print two identically-sized
-	 * 2D arrays... but oh well. "Memory is cheap" - Ted
-	 * 
+	/*
+	 * printTable - not sure why we have specific methods to print two
+	 * identically-sized 2D arrays... but oh well. "Memory is cheap" - Ted
 	 */
 	private static void printTable() {
 		for (int i = 0; i < board.length; i++) {
@@ -286,10 +442,35 @@ public class main {
 			}
 			System.out.println();
 		}
+		numOfEmptyAdj(turn%2+1);
 	}
 
-	/* initializeTable - creates the initial playing board
+	/* printTable - Weeeee printing a table as input for table Copies
+	 * 2D arrays... but oh well. "Memory is cheap" - Ted
 	 * 
+	 */
+	private static void printTable(int[][] tempBoard) {
+		for (int i = 0; i < tempBoard.length; i++) {
+			if (i == 0)
+				System.out.println("    0 1 2 3 4 5 6 7\n   ----------------");
+			System.out.print(i + " | ");
+			for (int j = 0; j < tempBoard.length; j++) {
+				if (tempBoard[i][j] == 1){
+					System.out.print(ANSI_RED + tempBoard[i][j] + " " + ANSI_RESET);
+				}
+				else if (tempBoard[i][j] == 2){
+					System.out.print(ANSI_BLACK + tempBoard[i][j] + " " + ANSI_RESET);
+				}
+				else{
+					System.out.print(tempBoard[i][j] + " ");
+				}
+			}
+			System.out.println();
+		}
+	}
+
+	/*
+	 * initializeTable - creates the initial playing board
 	 */
 	public static void initializeTable(int[][] a) {
 		for (int i = 0; i < a.length; i++)
@@ -300,7 +481,6 @@ public class main {
 		a[4][4] = 1;
 		a[3][4] = 2;
 		a[4][3] = 2;
-
 	}
 
 	/*
@@ -344,8 +524,7 @@ public class main {
 	 * CanFlip. NOTE: this probably doesn't actually work.
 	 */
 	public static boolean Legal(int X, int Y) {
-		int i, j, captures;
-		captures = 0;
+		int i, j;
 		if (board[X][Y] != 0)
 			return false;
 		// method to explore
@@ -372,24 +551,28 @@ public class main {
 		return nextMoves;
 	}
 
-	/* shittyHeuristic - a rough, initial heuristic that simply
-	 * prioritizes corners > edges > inner rings
-	 * 
+	/*
+	 * shittyHeuristic - a rough, initial heuristic that simply prioritizes
+	 * corners > edges > inner rings
 	 */
 	public static void shittyHeuristic() {
-		int[][] shit = {{20, -3, 11, 8, 8, 11, -3, 20},
-				{-3, -7, -4, 1, 1, -4, -7, -3},
-				{11, -4, 2, 2, 2, 2, -4, 11},
-				{8, 1, 2, -3, -3, 2, 1, 8},
-				{8, 1, 2, -3, -3, 2, 1, 8},
-				{11, -4, 2, 2, 2, 2, -4, 11},
-				{-3, -7, -4, 1, 1, -4, -7, -3},
-				{20, -3, 11, 8, 8, 11, -3, 20}};
+		int[][] shit = 
+			{
+				{ 20, -3, 11, 8, 8, 11, -3, 20 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 11, -4, 2, 2, 2, 2, -4, 11 }, 
+				{ 8, 1, 2, -3, -3, 2, 1, 8 },
+				{ 8, 1, 2, -3, -3, 2, 1, 8 }, 
+				{ 11, -4, 2, 2, 2, 2, -4, 11 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 20, -3, 11, 8, 8, 11, -3, 20 } 
+			};
 		moveValues = shit;
 	}
 
-	/* refreshMoveValues - refreshes every position in the parallel moveValues array to zero
-	 * 
+	/*
+	 * refreshMoveValues - refreshes every position in the parallel moveValues
+	 * array to zero
 	 */
 	public static void refreshMoveValues() {
 		for (int i = 0; i < moveValues.length; i++) {
@@ -399,8 +582,8 @@ public class main {
 		}
 	}
 
-	/* printMoveValues - prints out the 2D array of move values
-	 * 
+	/*
+	 * printMoveValues - prints out the 2D array of move values
 	 */
 	private static void printMoveValues() {
 		for (int i = 0; i < moveValues.length; i++) {
