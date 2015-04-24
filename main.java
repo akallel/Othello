@@ -13,6 +13,7 @@ public class main {
 	static int turn = 0;
 	static boolean noMoves = false;
 	static boolean gameOver = false;
+	static int DEPTH = 3;
 
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
@@ -85,6 +86,7 @@ public class main {
 					Node cornerNode = null;
 					int[] n = new int[2];
 
+					//check if there's a corner available: if so, we want to take it.
 					for (int i = 0; i < nodes.size(); i++) {
 						if ((nodes.get(i).Y == 7) || (nodes.get(i).Y == 0))
 							if ((nodes.get(i).X == 7) || (nodes.get(i).X == 0)) {
@@ -92,20 +94,23 @@ public class main {
 								cornerNode = nodes.get(i);
 							}
 					}
+					//take the corner
 					if (corner) {
 						n[0] = cornerNode.X;
 						n[1] = cornerNode.Y;
+						
+					//otherwise, choose the best possible move according to our minimax
 					} else {
-						Game[] leaves = new Game[nodes.size()];
+						Game3[] leaves = new Game3[nodes.size()];
 						for (int i = 0; i < leaves.length; i++) {
-							leaves[i] = new Game(move(nodes.get(i)), turn + 1,
-									noMoves, gameOver);
+							leaves[i] = new Game3(move(nodes.get(i)), turn + 1,
+									noMoves, gameOver, DEPTH);
 							// System.out.println(nodes.get(i));
 						}
 
 						int[] leafResults = new int[leaves.length];
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = leaves[i].winValue;
+							leafResults[i] = leaves[i].value;
 							// System.out.println("Value: " + leafResults[i] +
 							// " " + leaves[i].winValue);
 						}
@@ -498,8 +503,7 @@ public class main {
 	 * CanFlip. NOTE: this probably doesn't actually work.
 	 */
 	public static boolean Legal(int X, int Y) {
-		int i, j, captures;
-		captures = 0;
+		int i, j;
 		if (board[X][Y] != 0)
 			return false;
 		// method to explore
