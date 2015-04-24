@@ -26,6 +26,10 @@ public class main {
 	
 	//the depth of our minimax/alpha-beta algorithm. The actual depth is DEPTH + 1, because of our treatment of leaf nodes.
 	static int DEPTH = 2;
+	
+	//human and computer values
+	static int COMPUTER = 2;
+	static int HUMAN = 1;
 
 	
 	/* main - runs the game.
@@ -216,17 +220,23 @@ public class main {
 	 * move - creates a new board with a potential computer move
 	 */
 	public static int[][] move(Node n) {
+		// 2D array for storage of our deep copy
 		int[][] newBoard = new int[8][8];
+		
+		// traverse the 2D board, recording all values in newBoard
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[i].length; j++) {
 				newBoard[i][j] = board[i][j];
 			}
 		}
 
-		newBoard[n.Y][n.X] = 2;
+		// flip our tile of choice, designated by the parameter node
+		newBoard[n.Y][n.X] = COMPUTER;
 
 		// flip the resulting changed tiles
 		doFlip(turn, n.Y, n.X, newBoard);
+		
+		// return the deep copy, one move further into the game
 		return newBoard;
 	}
 
@@ -235,34 +245,45 @@ public class main {
 	 * valued position
 	 */
 	private static int bestMove(int[] leafResults) {
+		// temporaray storage for the index of the best move
 		int index = 0;
+		
+		// traverse the array of results, saving the index of the largest in index
 		for (int i = 1; i < leafResults.length; i++) {
 			if (leafResults[i] > leafResults[index]) {
 				index = i;
 			}
 		}
+		
+		//return index
 		return index;
 	}
 
 	/*
-	 * validMove - identifies if a provided (x,y) coordinate is a valid position
-	 * to place a tile
+	 * validMove - identifies if a provided (x,y) coordinate lies within the provided arraylist
 	 */
 	private static boolean validMove(int x, int y, ArrayList<Node> possMoves) {
+		
+		//traverse the arraylist
 		for (int i = 0; i < possMoves.size(); i++) {
+			//if we find a corresponding identical move, return true
 			if (possMoves.get(i).X == x && possMoves.get(i).Y == y)
 				return true;
 		}
+		//otherwise return false
 		return false;
 	}
 
-	/*
-	 * howMany - what the fuck is wrong with Anis
+	/* howMany - counts the number of tiles of a certain denomination (free, player 1, player 2) on the board
+	 * 
 	 */
 	private static int howMany(int a) {
+		//increment for our count
 		int answer = 0;
+		//traverse the 2D board
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
+				//increment answer only if we identify a tile of the same denomination as our parameter
 				if (board[i][j] == a)
 					answer++;
 			}
@@ -270,8 +291,8 @@ public class main {
 		return answer;
 	}
 
-	/*
-	 * numOfEmptyAdj - Returns the number of adjancent tiles of a given player
+	/* numOfEmptyAdj - Returns the number of adjancent tiles of a given player
+	 * 
 	 */
 	private static int numOfEmptyAdj(int a) {
 		int[][] tempBoard = copyBoard(board);
@@ -336,7 +357,9 @@ public class main {
 		return answer;
 	}
 
-	/*Deep copy of the board, just to keep the global board safe from African danger and other unwanted changes.*/
+	/* copyBoard - Deep copy of the board, just to keep the global board safe from African danger and other unwanted changes.
+	 * 
+	 */
 	private static int[][] copyBoard(int[][] board)	 {
 		int [][] a = new int [board.length][board[0].length];
 		for(int i=0;i<board.length;i++)
@@ -346,8 +369,8 @@ public class main {
 	}
 
 
-	/*
-	 * whereAreMyPieces - returns the coordinates of a player's pieces
+	/* whereAreMyPieces - returns the coordinates of a player's pieces
+	 * 
 	 */
 	private static ArrayList<Node> whereAreMyPieces(int a) {
 		ArrayList<Node> myPieces = new ArrayList<Node>();
@@ -375,8 +398,8 @@ public class main {
 		flipCheck(turn, newx, newy, -1, -1, board); // Checks south
 	}
 
-	/*
-	 * flipCheck - actually flips the tiles in a specific direction
+	/* flipCheck - actually flips the tiles in a specific direction
+	 * 
 	 */
 	private static boolean flipCheck(int turn, int newx, int newy, int dirx,
 			int diry, int[][] board) {
