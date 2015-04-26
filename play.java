@@ -16,6 +16,8 @@ public class play {
 		int time1 = Integer.valueOf(TIMELIMIT1);
 		int time2 = Integer.valueOf(TIMELIMIT2);
 		int depth = Integer.valueOf(DEPTHLIMIT);
+		if(time1 != 0)
+			depth = 0;
 		if(COLOR.equalsIgnoreCase("B"))
 			compColor = 0;
 		if(time2 != 0){

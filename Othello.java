@@ -51,9 +51,17 @@ public class Othello {
 			HUMAN = BLACK;
 		}
 		//right now, our algorithm always works at a fixed depth
-		DEPTH = 2;
+		if(time1 >= 1000)
+			DEPTH = 1;
+		if(time1 >= 4000)
+			DEPTH = 2;
+		if(time1 >= 16000)
+			DEPTH = 2;
+		if(time1 >= 240000)
+			DEPTH = 4;
+		System.out.println(DEPTH);
 		//but we still need a check to make sure our depth is less than the depth limit
-		if(DEPTH > depth)
+		if(DEPTH > depth && depth != 0)
 			DEPTH = depth;
 		
 		//create a scanner, initialize the board in the starting state, and print it out
@@ -188,14 +196,14 @@ public class Othello {
 						}
 
 						// store the leaf results in the leafResult integer array
-						int[] leafResults = new int[leaves.length];
+						double[] leafResults = new double[leaves.length];
 						
 						// miniMax stores our chosen leaf index within the leaf array
 						int miniMax = 0;
 						
 						// find the best value of our possible choices (mind you, these record their worst value - hence the minimax)
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = (int)leaves[i].chosenValue;
+							leafResults[i] = leaves[i].winPercent;
 							if(leafResults[i] > leafResults[miniMax])
 								miniMax = i;
 						}

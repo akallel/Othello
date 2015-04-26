@@ -3,13 +3,13 @@ import java.util.ArrayList;
 
 public class Game3{
 	int turn;
-	double worstValue, bestValue, chosenValue;
+	int worstValue, bestValue, chosenValue;
 	int COMPUTER;
+	double winPercent;
 	public Game3(int[][] board, int turn, boolean noMoves, boolean gameOver, int depth, int HUMAN, int COMPUTER){
 		this.turn = turn;
 		this.COMPUTER = COMPUTER;
 		double lossCount = 0;
-		double winPercent;
 		//if the depth is > 0, we want to call Game3 on all of our children
 		if(depth > 0){
 			//generate move boards
@@ -25,7 +25,9 @@ public class Game3{
 				if(branchPlays[i].worstValue < bestValue){
 					bestValue = branchPlays[i].bestValue;
 				}
+				winPercent += branchPlays[i].winPercent;
 			}
+			winPercent /= branches.size();
 			if(turn%2==COMPUTER % 2)
 				chosenValue = bestValue;
 			else 
@@ -34,19 +36,24 @@ public class Game3{
 		else{
 			ArrayList<Node> branches = allNextMoves(board);
 			Game[] branchPlays = new Game[branches.size()];
+			int winCount = 0;
 			for(int i = 0; i < branches.size(); i++){
 				branchPlays[i] = new Game(move(branches.get(i), board), turn, noMoves, gameOver, HUMAN, COMPUTER);
 				if(branchPlays[i].winValue < worstValue)
 					worstValue = branchPlays[i].winValue;
 				if(branchPlays[i].winValue > bestValue)
 					bestValue = branchPlays[i].winValue;
+				if(branchPlays[i].winValue > 0)
+					winCount++;
+			}
+			winPercent = (double)winCount / branches.size();
+				
 			}
 			if(turn%2==COMPUTER % 2)
 				chosenValue = bestValue;
 			else 
 				chosenValue = worstValue;
-			//winPercent = lossCount / branchPlays.length;
-		}
+		
 		
 	}
 	
