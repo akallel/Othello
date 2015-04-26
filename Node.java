@@ -7,6 +7,6 @@ public class Node{
 	}
 	
 	public String toString(){
-		return "(" + X + "," + Y + ")";
+		return "(" + Y + "," + X + ")";
 	}
 }

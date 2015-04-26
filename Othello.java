@@ -107,8 +107,8 @@ public class Othello {
 						if (a.matches("^[0-9]+ ([0-9]+)")) {
 							String[] aa = a.split("\\s");
 							//parse the input string into two integers for movement
-							n1 = Integer.parseInt(aa[0]);
-							n2 = Integer.parseInt(aa[1]);
+							n1 = Integer.parseInt(aa[1]);
+							n2 = Integer.parseInt(aa[0]);
 						}
 					} while (!validMove(n1, n2, nodes));
 

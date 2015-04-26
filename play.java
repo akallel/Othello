@@ -12,12 +12,12 @@ public class play {
 		String TIMELIMIT1 = args[2];	//CPU time (ms) allowed for one move; 0 if no limit
 		String TIMELIMIT2 = args[3];	//total time for game in ms, 0 if none. If timelimit2 != 0, DEPTHLIMIT and TIMELIMIT1 do not matter.
 		
-		int compColor = 0;
+		int compColor = 1;
 		int time1 = Integer.valueOf(TIMELIMIT1);
 		int time2 = Integer.valueOf(TIMELIMIT2);
 		int depth = Integer.valueOf(DEPTHLIMIT);
 		if(COLOR.equalsIgnoreCase("B"))
-			compColor = 1;
+			compColor = 0;
 		if(time2 != 0){
 			time1 = 0;
 			depth = 0;
