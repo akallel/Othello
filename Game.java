@@ -123,20 +123,6 @@ public class Game {
 	 * bestMove - traverses the 2D array, recording the coordinates of the best
 	 * valued position
 	 */
-	private static int bestMove(int[] leafResults) {
-		int index = 0;
-		for (int i = 1; i < leafResults.length; i++) {
-			if (leafResults[i] > leafResults[index]) {
-				index = i;
-			}
-		}
-		return index;
-	}
-	
-	/*
-	 * bestMove - traverses the 2D array, recording the coordinates of the best
-	 * valued position
-	 */
 	private int[] bestMove(ArrayList<Node> possMoves) {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y;
@@ -157,19 +143,7 @@ public class Game {
 	}
 
 	/*
-	 * validMove - identifies if a provided (x,y) coordinate is a valid position
-	 * to place a tile
-	 */
-	private boolean validMove(int x, int y, ArrayList<Node> possMoves) {
-		for (int i = 0; i < possMoves.size(); i++) {
-			if (possMoves.get(i).X == x && possMoves.get(i).Y == y)
-				return true;
-		}
-		return false;
-	}
-
-	/*
-	 * howMany - what the fuck is wrong with Anis
+	 * howMany - how many tiles belong to player a?
 	 */
 	private int howMany(int a) {
 		int answer = 0;
@@ -183,7 +157,7 @@ public class Game {
 	}
 
 	/*
-	 * numOfEmptyAdj - Returns the number of adjancent tiles of a given player
+	 * numOfEmptyAdj - Returns the number of adjacent tiles of a given player
 	 */
 	private int numOfEmptyAdj(int a) {
 		int[][] tempBoard = copyBoard(board);
@@ -354,8 +328,7 @@ public class Game {
 	 * CanFlip. NOTE: this probably doesn't actually work.
 	 */
 	public boolean Legal(int X, int Y) {
-		int i, j, captures;
-		captures = 0;
+		int i, j;
 		if (board[X][Y] != 0)
 			return false;
 		// method to explore
