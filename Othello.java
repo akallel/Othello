@@ -35,6 +35,8 @@ public class Othello {
 	static int BLACK = 1;
 	static int WHITE = 2;
 
+	static int HUMANMOVE;
+	static int COMPUTERMOVE;
 	
 	/* main - runs the game.
 	 * 
@@ -42,16 +44,24 @@ public class Othello {
 	public Othello(int compColor, int time1, int time2, int depth) {
 		//which player will the computer be?
 		if(compColor == 1){
-			COMPUTER = 1;
-			HUMAN = 2;
+			COMPUTER = BLACK;
+			HUMAN = WHITE;
 		}else{
-			COMPUTER = 2;
-			COMPUTER = 1;
+			COMPUTER = WHITE;
+			HUMAN = BLACK;
 		}
 		//right now, our algorithm always works at a fixed depth
-		DEPTH = 2;
+		if(time1 >= 1000)
+			DEPTH = 1;
+		if(time1 >= 4000)
+			DEPTH = 2;
+		if(time1 >= 16000)
+			DEPTH = 2;
+		if(time1 >= 240000)
+			DEPTH = 4;
+		System.out.println(DEPTH);
 		//but we still need a check to make sure our depth is less than the depth limit
-		if(DEPTH > depth)
+		if(DEPTH > depth && depth != 0)
 			DEPTH = depth;
 		
 		//create a scanner, initialize the board in the starting state, and print it out
@@ -60,8 +70,8 @@ public class Othello {
 		printTable();
 		
 		//for checking whose move it is
-		int HUMANMOVE = HUMAN % 2;
-		int COMPUTERMOVE = COMPUTER % 2;
+		HUMANMOVE = HUMAN % 2;
+		COMPUTERMOVE = COMPUTER % 2;
 
 		//if gameOver is true, both players can't move and the game is over
 		while (!gameOver) { 
@@ -95,25 +105,25 @@ public class Othello {
 						a = "";
 						//print out the player's options
 						System.out.println("Your options for player "
-								+ (turn % 2 + 1) + " are: " + nodes.toString());
+								+ HUMAN + " are: " + nodes.toString());
 						System.out.println("choose coordinates a,b");
 						
 						//read in player input
-						a = scan.next();
+						a = scan.nextLine();
 						
 						// check if the input string is the correct format
-						if (a.matches("^[0-9]+(,[0-9]+)")) {
-							String[] aa = a.split(",");
+						if (a.matches("^[0-9]+ ([0-9]+)")) {
+							String[] aa = a.split("\\s");
 							//parse the input string into two integers for movement
-							n1 = Integer.parseInt(aa[0]);
-							n2 = Integer.parseInt(aa[1]);
+							n1 = Integer.parseInt(aa[1]);
+							n2 = Integer.parseInt(aa[0]);
 						}
 					} while (!validMove(n1, n2, nodes));
 
 					// once we've determined that the player has selected a
 					// valid move
 					// we change the tile
-					board[n1][n2] = 1;
+					board[n1][n2] = HUMAN;
 
 					// flip the resulting changed tiles
 					doFlip(turn, n1, n2);
@@ -186,14 +196,14 @@ public class Othello {
 						}
 
 						// store the leaf results in the leafResult integer array
-						int[] leafResults = new int[leaves.length];
+						double[] leafResults = new double[leaves.length];
 						
 						// miniMax stores our chosen leaf index within the leaf array
 						int miniMax = 0;
 						
 						// find the best value of our possible choices (mind you, these record their worst value - hence the minimax)
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = leaves[i].chosenValue;
+							leafResults[i] = leaves[i].winPercent;
 							if(leafResults[i] > leafResults[miniMax])
 								miniMax = i;
 						}
@@ -204,8 +214,8 @@ public class Othello {
 					}
 
 					//print out the chosen computer move
-					System.out.println("Computer moves to: (" + n[0] + ","
-							+ n[1] + ")");
+					System.out.println("Computer moves to: (" + n[1] + ","
+							+ n[0] + ")");
 					
 					//change that spot to the computer tile value
 					board[n[0]][n[1]] = COMPUTER;
@@ -382,7 +392,7 @@ public class Othello {
 					Node newNode = new Node(i, j);
 					myPieces.add(newNode);
 				}
-		System.out.println("my pieces are at: "+myPieces);
+		//System.out.println("my pieces are at: "+myPieces);
 		return myPieces;
 	}
 
@@ -411,12 +421,12 @@ public class Othello {
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
@@ -462,12 +472,12 @@ public class Othello {
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
@@ -535,12 +545,12 @@ public class Othello {
 	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		boolean capture = false;

@@ -4,8 +4,14 @@ import java.util.ArrayList;
 public class Game3{
 	int turn;
 	int worstValue, bestValue, chosenValue;
+	int COMPUTER;
+	double winPercent;
 	public Game3(int[][] board, int turn, boolean noMoves, boolean gameOver, int depth, int HUMAN, int COMPUTER){
 		this.turn = turn;
+		this.COMPUTER = COMPUTER;
+		worstValue = Integer.MIN_VALUE;
+		bestValue = Integer.MAX_VALUE;
+		double lossCount = 0;
 		//if the depth is > 0, we want to call Game3 on all of our children
 		if(depth > 0){
 			//generate move boards
@@ -13,12 +19,16 @@ public class Game3{
 			Game3[] branchPlays = new Game3[branches.size()];
 			for(int i = 0; i < branches.size(); i++){
 				branchPlays[i] = new Game3(move(branches.get(i), board), turn, noMoves, gameOver, depth - 1, HUMAN, COMPUTER);
-				if(branchPlays[i].worstValue < worstValue)
-					worstValue = branchPlays[i].worstValue;
-				if(branchPlays[i].bestValue > bestValue)
+				if(branchPlays[i].bestValue < bestValue){
 					bestValue = branchPlays[i].bestValue;
+				}
+				if(branchPlays[i].worstValue > worstValue){
+					worstValue = branchPlays[i].worstValue;
+				}
+				winPercent += branchPlays[i].winPercent;
 			}
-			if(turn%2==0)
+			winPercent /= branches.size();
+			if(turn%2==COMPUTER % 2)
 				chosenValue = bestValue;
 			else 
 				chosenValue = worstValue;
@@ -26,19 +36,24 @@ public class Game3{
 		else{
 			ArrayList<Node> branches = allNextMoves(board);
 			Game[] branchPlays = new Game[branches.size()];
+			int winCount = 0;
 			for(int i = 0; i < branches.size(); i++){
 				branchPlays[i] = new Game(move(branches.get(i), board), turn, noMoves, gameOver, HUMAN, COMPUTER);
 				if(branchPlays[i].winValue < worstValue)
 					worstValue = branchPlays[i].winValue;
 				if(branchPlays[i].winValue > bestValue)
 					bestValue = branchPlays[i].winValue;
-			
+				if(branchPlays[i].winValue > 0)
+					winCount++;
 			}
-			if(turn%2==0)
+			winPercent = (double)winCount / branches.size();
+			}
+			if(turn%2==COMPUTER % 2)
 				chosenValue = bestValue;
 			else 
 				chosenValue = worstValue;
-		}
+		
+		
 	}
 	
 	/*
@@ -52,7 +67,7 @@ public class Game3{
 			}
 		}
 
-		newBoard[n.Y][n.X] = 2;
+		newBoard[n.Y][n.X] = COMPUTER;
 
 		// flip the resulting changed tiles
 		doFlip(turn, n.Y, n.X, newBoard);
