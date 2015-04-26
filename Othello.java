@@ -193,7 +193,7 @@ public class Othello {
 						
 						// find the best value of our possible choices (mind you, these record their worst value - hence the minimax)
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = leaves[i].worstValue;
+							leafResults[i] = leaves[i].chosenValue;
 							if(leafResults[i] > leafResults[miniMax])
 								miniMax = i;
 						}
