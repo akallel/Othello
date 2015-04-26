@@ -5,17 +5,24 @@ public class Game {
 	int turn;
 	int[][] board = new int[8][8];
 	int[][] moveValues = { { 20, -3, 11, 8, 8, 11, -3, 20 },
-				{ -3, -7, -4, 1, 1, -4, -7, -3 }, { 11, -4, 2, 2, 2, 2, -4, 11 },
-				{ 8, 1, 2, -3, -3, 2, 1, 8 }, { 8, 1, 2, -3, -3, 2, 1, 8 },
-				{ 11, -4, 2, 2, 2, 2, -4, 11 }, { -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 }, 
+				{ 11, -4, 2, 2, 2, 2, -4, 11 },
+				{ 8, 1, 2, -3, -3, 2, 1, 8 }, 
+				{ 8, 1, 2, -3, -3, 2, 1, 8 },
+				{ 11, -4, 2, 2, 2, 2, -4, 11 }, 
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
 				{ 20, -3, 11, 8, 8, 11, -3, 20 } };
 
 	boolean noMoves = false;
 	boolean gameOver = false;
-	int numTabs = 0;
 	int winValue;
+	int HUMAN;
+	int COMPUTER;
 
-	public Game(int[][] board, int turn, boolean noMoves, boolean gameOver) {
+	public Game(int[][] board, int turn, boolean noMoves, boolean gameOver, int HUMAN, int COMPUTER) {
+		//or are we dancer?
+		this.HUMAN = HUMAN;
+		this.COMPUTER = COMPUTER;
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board.length; j++) {
 				this.board[i][j] = board[i][j];
@@ -30,14 +37,13 @@ public class Game {
 	public void play() {
 		gameNum++;
 		while (!gameOver) {
-			if (turn % 2 == 0) {
+			if (turn % 2 == HUMAN % 2) {
 				ArrayList<Node> nodes = allNextMoves();
 				if (nodes.isEmpty()) {
 					turn++;
 					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
-					//System.out.println("No moves for *human*");
 				} else {
 					
 					noMoves = false;
@@ -52,7 +58,6 @@ public class Game {
 								cornerNode = nodes.get(i);
 							}
 					}
-					// printMoveValues();
 					
 					if (corner) {
 						n[0] = cornerNode.X;
@@ -67,22 +72,14 @@ public class Game {
 			} else {
 				// player 2 moves
 				ArrayList<Node> nodes = allNextMoves();
-				// printTable();
 				if (nodes.isEmpty()) {
 					turn++;
 					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
-					//System.out.println("No moves for *computer*");
 				} else {
 					noMoves = false;
-					// printMoveValues();
-					//int[] n = bestMove(nodes);
-					/*
-					for(int i = 0; i < numTabs; i++){
-						System.out.print(' ');
-					}
-					System.out.println("*computer* moves to: " + n[1] + ", " + n[0]);*/
+					
 					boolean corner = false;
 					Node cornerNode = null;
 					int[] n = new int[2];
@@ -94,7 +91,6 @@ public class Game {
 								cornerNode = nodes.get(i);
 							}
 					}
-					// printMoveValues();
 					
 					if (corner) {
 						n[0] = cornerNode.X;
@@ -107,27 +103,11 @@ public class Game {
 					turn++;
 				}
 			}
-			numTabs++;
+			shittyHeuristic();
 		}
-
+		
 		// count who won if the board is full
-		winValue = howMany(2) - howMany(1);
-
-		//System.out.printf("game #%d winValue: %d\n", gameNum, winValue);
-	}
-	
-	/*
-	 * bestMove - traverses the 2D array, recording the coordinates of the best
-	 * valued position
-	 */
-	private static int bestMove(int[] leafResults) {
-		int index = 0;
-		for (int i = 1; i < leafResults.length; i++) {
-			if (leafResults[i] > leafResults[index]) {
-				index = i;
-			}
-		}
-		return index;
+		winValue = howMany(COMPUTER) - howMany(HUMAN);
 	}
 	
 	/*
@@ -138,12 +118,12 @@ public class Game {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y;
 		int frontiers = numOfEmptyAdj(turn%2+1);
-		int val = moveValues[y][x] - frontiers;
+		int val = moveValues[y][x]- frontiers;
 		// Need to make this "frontiers" value be calculated for each possible move
 		// so that number of frontier spaces are compared across different moves
 
 		for (int i = 1; i < possMoves.size(); i++) {
-			if (val < (moveValues[possMoves.get(i).Y][possMoves.get(i).X]) - frontiers) {
+			if (val < (moveValues[possMoves.get(i).Y][possMoves.get(i).X] - frontiers)) {
 				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X] - frontiers;
 				x = possMoves.get(i).X;
 				y = possMoves.get(i).Y;
@@ -154,19 +134,7 @@ public class Game {
 	}
 
 	/*
-	 * validMove - identifies if a provided (x,y) coordinate is a valid position
-	 * to place a tile
-	 */
-	private boolean validMove(int x, int y, ArrayList<Node> possMoves) {
-		for (int i = 0; i < possMoves.size(); i++) {
-			if (possMoves.get(i).X == x && possMoves.get(i).Y == y)
-				return true;
-		}
-		return false;
-	}
-
-	/*
-	 * howMany - what the fuck is wrong with Anis
+	 * howMany - how many tiles belong to player a?
 	 */
 	private int howMany(int a) {
 		int answer = 0;
@@ -180,7 +148,7 @@ public class Game {
 	}
 
 	/*
-	 * numOfEmptyAdj - Returns the number of adjancent tiles of a given player
+	 * numOfEmptyAdj - Returns the number of adjacent tiles of a given player
 	 */
 	private int numOfEmptyAdj(int a) {
 		int[][] tempBoard = copyBoard(board);
@@ -351,8 +319,7 @@ public class Game {
 	 * CanFlip. NOTE: this probably doesn't actually work.
 	 */
 	public boolean Legal(int X, int Y) {
-		int i, j, captures;
-		captures = 0;
+		int i, j;
 		if (board[X][Y] != 0)
 			return false;
 		// method to explore
@@ -377,5 +344,24 @@ public class Game {
 					nextMoves.add(newNode);
 				}
 		return nextMoves;
+	}
+	
+	/*
+	 * shittyHeuristic - a rough, initial heuristic that simply prioritizes
+	 * corners > edges > inner rings
+	 */
+	public void shittyHeuristic() {
+		int[][] shit = 
+			{
+				{ 20, -3, 11, 8, 8, 11, -3, 20 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 11, -4, 2, 2, 2, 2, -4, 11 }, 
+				{ 8, 1, 2, -3, -3, 2, 1, 8 },
+				{ 8, 1, 2, -3, -3, 2, 1, 8 }, 
+				{ 11, -4, 2, 2, 2, 2, -4, 11 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 20, -3, 11, 8, 8, 11, -3, 20 } 
+			};
+		moveValues = shit;
 	}
 }
