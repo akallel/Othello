@@ -39,9 +39,9 @@ public class Othello {
 	/* main - runs the game.
 	 * 
 	 */
-	public Othello(String compColor, int time1, int time2, int depth) {
+	public Othello(int compColor, int time1, int time2, int depth) {
 		//which player will the computer be?
-		if(compColor.equalsIgnoreCase("B")){
+		if(compColor == 1){
 			COMPUTER = 1;
 			HUMAN = 2;
 		}else{
@@ -58,6 +58,10 @@ public class Othello {
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
 		printTable();
+		
+		//for checking whose move it is
+		int HUMANMOVE = HUMAN % 2;
+		int COMPUTERMOVE = COMPUTER % 2;
 
 		//if gameOver is true, both players can't move and the game is over
 		while (!gameOver) { 
@@ -66,7 +70,7 @@ public class Othello {
 			int n1 = 0, n2 = 0;
 
 			//check  whose turn it is
-			if (turn % 2 == 0) {
+			if (turn % 2 == HUMANMOVE) {
 				// player 1 moves
 				ArrayList<Node> nodes = allNextMoves();
 				
@@ -101,8 +105,8 @@ public class Othello {
 						if (a.matches("^[0-9]+(,[0-9]+)")) {
 							String[] aa = a.split(",");
 							//parse the input string into two integers for movement
-							n2 = Integer.parseInt(aa[0]);
-							n1 = Integer.parseInt(aa[1]);
+							n1 = Integer.parseInt(aa[0]);
+							n2 = Integer.parseInt(aa[1]);
 						}
 					} while (!validMove(n1, n2, nodes));
 
@@ -178,7 +182,7 @@ public class Othello {
 						for (int i = 0; i < leaves.length; i++) {
 							//Game3 will branch to the designated depth (+ 1) and evaluate the worst value in each branch
 							leaves[i] = new Game3(move(nodes.get(i)), turn + 1,
-									noMoves, gameOver, DEPTH);
+									noMoves, gameOver, DEPTH, HUMAN, COMPUTER);
 						}
 
 						// store the leaf results in the leafResult integer array
@@ -200,11 +204,11 @@ public class Othello {
 					}
 
 					//print out the chosen computer move
-					System.out.println("Computer moves to: (" + n[1] + ","
-							+ n[0] + ")");
+					System.out.println("Computer moves to: (" + n[0] + ","
+							+ n[1] + ")");
 					
 					//change that spot to the computer tile value
-					board[n[0]][n[1]] = 2;
+					board[n[0]][n[1]] = COMPUTER;
 					//execute a flip of adjacent tiles as per Othello rules
 					doFlip(turn, n[0], n[1]);
 					//increment the turn
@@ -256,25 +260,6 @@ public class Othello {
 		
 		// return the deep copy, one move further into the game
 		return newBoard;
-	}
-
-	/*
-	 * bestMove - traverses the 2D array, recording the coordinates of the best
-	 * valued position
-	 */
-	private static int bestMove(int[] leafResults) {
-		// temporaray storage for the index of the best move
-		int index = 0;
-		
-		// traverse the array of results, saving the index of the largest in index
-		for (int i = 1; i < leafResults.length; i++) {
-			if (leafResults[i] > leafResults[index]) {
-				index = i;
-			}
-		}
-		
-		//return index
-		return index;
 	}
 
 	/*
@@ -385,7 +370,6 @@ public class Othello {
 				a[i][j]= board[i][j];
 		return a;
 	}
-
 
 	/* whereAreMyPieces - returns the coordinates of a player's pieces
 	 * 
@@ -528,33 +512,9 @@ public class Othello {
 		}
 		numOfEmptyAdj(turn%2+1);
 	}
-
-	/* printTable - Weeeee printing a table as input for table Copies
-	 * 2D arrays... but oh well. "Memory is cheap" - Ted
+	
+	/* initializeTable - creates the initial playing board
 	 * 
-	 */
-	private static void printTable(int[][] tempBoard) {
-		for (int i = 0; i < tempBoard.length; i++) {
-			if (i == 0)
-				System.out.println("    0 1 2 3 4 5 6 7\n   ----------------");
-			System.out.print(i + " | ");
-			for (int j = 0; j < tempBoard.length; j++) {
-				if (tempBoard[i][j] == 1){
-					System.out.print(ANSI_RED + tempBoard[i][j] + " " + ANSI_RESET);
-				}
-				else if (tempBoard[i][j] == 2){
-					System.out.print(ANSI_BLACK + tempBoard[i][j] + " " + ANSI_RESET);
-				}
-				else{
-					System.out.print(tempBoard[i][j] + " ");
-				}
-			}
-			System.out.println();
-		}
-	}
-
-	/*
-	 * initializeTable - creates the initial playing board
 	 */
 	public static void initializeTable(int[][] a) {
 		for (int i = 0; i < a.length; i++)
@@ -567,10 +527,10 @@ public class Othello {
 		a[4][3] = 2;
 	}
 
-	/*
-	 * CanFlip - moves out in a given direction from an empty tile to identify
+	/* CanFlip - moves out in a given direction from an empty tile to identify
 	 * if that tile represents a valid move for the team moving on the current
 	 * turn. dirX, dirY should be {-1, 0, 1}, but should never BOTH be zero.
+	 * 
 	 */
 	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
@@ -663,26 +623,6 @@ public class Othello {
 			for (int j = 0; j < moveValues[i].length; j++) {
 				moveValues[i][j] = 0;
 			}
-		}
-	}
-
-	/*
-	 * printMoveValues - prints out the 2D array of move values
-	 */
-	private static void printMoveValues() {
-		for (int i = 0; i < moveValues.length; i++) {
-			if (i == 0)
-				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
-			System.out.print(i + " | ");
-			for (int j = 0; j < moveValues.length; j++) {
-				if (moveValues[i][j] == 1)
-					System.out.print(moveValues[i][j] + " ");
-				else if (moveValues[i][j] == 2)
-					System.out.print(moveValues[i][j] + " ");
-				else
-					System.out.print(moveValues[i][j] + " ");
-			}
-			System.out.println();
 		}
 	}
 }

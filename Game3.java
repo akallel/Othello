@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class Game3{
 	int turn;
 	int worstValue;
-	public Game3(int[][] board, int turn, boolean noMoves, boolean gameOver, int depth){
+	public Game3(int[][] board, int turn, boolean noMoves, boolean gameOver, int depth, int HUMAN, int COMPUTER){
 		this.turn = turn;
 		//if the depth is > 0, we want to call Game3 on all of our children
 		if(depth > 0){
@@ -12,7 +12,7 @@ public class Game3{
 			ArrayList<Node> branches = allNextMoves(board);
 			Game3[] branchPlays = new Game3[branches.size()];
 			for(int i = 0; i < branches.size(); i++){
-				branchPlays[i] = new Game3(move(branches.get(i), board), turn, noMoves, gameOver, depth - 1);
+				branchPlays[i] = new Game3(move(branches.get(i), board), turn, noMoves, gameOver, depth - 1, HUMAN, COMPUTER);
 				if(branchPlays[i].worstValue > worstValue)
 					worstValue = branchPlays[i].worstValue;
 			}
@@ -21,7 +21,7 @@ public class Game3{
 			ArrayList<Node> branches = allNextMoves(board);
 			Game[] branchPlays = new Game[branches.size()];
 			for(int i = 0; i < branches.size(); i++){
-				branchPlays[i] = new Game(move(branches.get(i), board), turn, noMoves, gameOver);
+				branchPlays[i] = new Game(move(branches.get(i), board), turn, noMoves, gameOver, HUMAN, COMPUTER);
 				if(branchPlays[i].winValue > worstValue)
 					worstValue = branchPlays[i].winValue;
 			}

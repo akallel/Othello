@@ -14,8 +14,13 @@ public class Game {
 	boolean gameOver = false;
 	int numTabs = 0;
 	int winValue;
+	int HUMAN;
+	int COMPUTER;
 
-	public Game(int[][] board, int turn, boolean noMoves, boolean gameOver) {
+	public Game(int[][] board, int turn, boolean noMoves, boolean gameOver, int HUMAN, int COMPUTER) {
+		//or are we dancer?
+		this.HUMAN = HUMAN;
+		this.COMPUTER = COMPUTER;
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board.length; j++) {
 				this.board[i][j] = board[i][j];
@@ -30,7 +35,7 @@ public class Game {
 	public void play() {
 		gameNum++;
 		while (!gameOver) {
-			if (turn % 2 == 0) {
+			if (turn % 2 == HUMAN % 2) {
 				ArrayList<Node> nodes = allNextMoves();
 				if (nodes.isEmpty()) {
 					turn++;
