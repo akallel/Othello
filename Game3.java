@@ -9,21 +9,21 @@ public class Game3{
 	public Game3(int[][] board, int turn, boolean noMoves, boolean gameOver, int depth, int HUMAN, int COMPUTER){
 		this.turn = turn;
 		this.COMPUTER = COMPUTER;
+		worstValue = Integer.MIN_VALUE;
+		bestValue = Integer.MAX_VALUE;
 		double lossCount = 0;
 		//if the depth is > 0, we want to call Game3 on all of our children
 		if(depth > 0){
 			//generate move boards
-			worstValue = Integer.MIN_VALUE;
-			bestValue = Integer.MAX_VALUE;
 			ArrayList<Node> branches = allNextMoves(board);
 			Game3[] branchPlays = new Game3[branches.size()];
 			for(int i = 0; i < branches.size(); i++){
 				branchPlays[i] = new Game3(move(branches.get(i), board), turn, noMoves, gameOver, depth - 1, HUMAN, COMPUTER);
-				if(branchPlays[i].bestValue > worstValue){
-					worstValue = branchPlays[i].worstValue;
-				}
-				if(branchPlays[i].worstValue < bestValue){
+				if(branchPlays[i].bestValue < bestValue){
 					bestValue = branchPlays[i].bestValue;
+				}
+				if(branchPlays[i].worstValue > worstValue){
+					worstValue = branchPlays[i].worstValue;
 				}
 				winPercent += branchPlays[i].winPercent;
 			}
@@ -47,7 +47,6 @@ public class Game3{
 					winCount++;
 			}
 			winPercent = (double)winCount / branches.size();
-				
 			}
 			if(turn%2==COMPUTER % 2)
 				chosenValue = bestValue;
