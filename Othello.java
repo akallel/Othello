@@ -3,7 +3,7 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 /*java checks for nqueens : http://www.codeshare.io/KExMg*/
-public class main {
+public class Othello {
 	// color values (for prettiness!)
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
@@ -25,17 +25,35 @@ public class main {
 	static boolean gameOver = false;
 	
 	//the depth of our minimax/alpha-beta algorithm. The actual depth is DEPTH + 1, because of our treatment of leaf nodes.
-	static int DEPTH = 2;
+	static int DEPTH;
 	
 	//human and computer values
-	static int COMPUTER = 2;
-	static int HUMAN = 1;
+	static int COMPUTER;
+	static int HUMAN;
+	
+	//black is represented by a 1 (for player 1), white is represented by a 2 (for player 2)
+	static int BLACK = 1;
+	static int WHITE = 2;
 
 	
 	/* main - runs the game.
 	 * 
 	 */
-	public static void main(String[] args) {
+	public Othello(String compColor, int time1, int time2, int depth) {
+		//which player will the computer be?
+		if(compColor.equalsIgnoreCase("B")){
+			COMPUTER = 1;
+			HUMAN = 2;
+		}else{
+			COMPUTER = 2;
+			COMPUTER = 1;
+		}
+		//right now, our algorithm always works at a fixed depth
+		DEPTH = 2;
+		//but we still need a check to make sure our depth is less than the depth limit
+		if(DEPTH > depth)
+			DEPTH = depth;
+		
 		//create a scanner, initialize the board in the starting state, and print it out
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
