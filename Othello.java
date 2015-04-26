@@ -101,11 +101,11 @@ public class Othello {
 						System.out.println("choose coordinates a,b");
 						
 						//read in player input
-						a = scan.next();
+						a = scan.nextLine();
 						
 						// check if the input string is the correct format
-						if (a.matches("^[0-9]+(,[0-9]+)")) {
-							String[] aa = a.split(",");
+						if (a.matches("^[0-9]+ ([0-9]+)")) {
+							String[] aa = a.split("\\s");
 							//parse the input string into two integers for movement
 							n1 = Integer.parseInt(aa[0]);
 							n2 = Integer.parseInt(aa[1]);
