@@ -171,7 +171,7 @@ public class main {
 						
 						// find the best value of our possible choices (mind you, these record their worst value - hence the minimax)
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = leaves[i].worstValue;
+							leafResults[i] = leaves[i].chosenValue;
 							if(leafResults[i] > leafResults[miniMax])
 								miniMax = i;
 						}
@@ -497,10 +497,10 @@ public class main {
 			System.out.print(i + " | ");
 			for (int j = 0; j < board.length; j++) {
 				if (board[i][j] == 1){
-					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
+					System.out.print(board[i][j] + " ");
 				}
 				else if (board[i][j] == 2){
-					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
+					System.out.print(board[i][j] + " ");
 				}
 				else{
 					System.out.print(board[i][j] + " ");
@@ -522,10 +522,10 @@ public class main {
 			System.out.print(i + " | ");
 			for (int j = 0; j < tempBoard.length; j++) {
 				if (tempBoard[i][j] == 1){
-					System.out.print(ANSI_RED + tempBoard[i][j] + " " + ANSI_RESET);
+					System.out.print(tempBoard[i][j] + " ");
 				}
 				else if (tempBoard[i][j] == 2){
-					System.out.print(ANSI_BLACK + tempBoard[i][j] + " " + ANSI_RESET);
+					System.out.print(tempBoard[i][j] + " ");
 				}
 				else{
 					System.out.print(tempBoard[i][j] + " ");

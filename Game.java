@@ -113,7 +113,7 @@ public class Game {
 		// count who won if the board is full
 		winValue = howMany(2) - howMany(1);
 
-		System.out.printf("game #%d winValue: %d\n", gameNum, winValue);
+		//System.out.printf("game #%d winValue: %d\n", gameNum, winValue);
 	}
 	
 	/*
