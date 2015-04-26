@@ -5,14 +5,16 @@ public class Game {
 	int turn;
 	int[][] board = new int[8][8];
 	int[][] moveValues = { { 20, -3, 11, 8, 8, 11, -3, 20 },
-				{ -3, -7, -4, 1, 1, -4, -7, -3 }, { 11, -4, 2, 2, 2, 2, -4, 11 },
-				{ 8, 1, 2, -3, -3, 2, 1, 8 }, { 8, 1, 2, -3, -3, 2, 1, 8 },
-				{ 11, -4, 2, 2, 2, 2, -4, 11 }, { -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 }, 
+				{ 11, -4, 2, 2, 2, 2, -4, 11 },
+				{ 8, 1, 2, -3, -3, 2, 1, 8 }, 
+				{ 8, 1, 2, -3, -3, 2, 1, 8 },
+				{ 11, -4, 2, 2, 2, 2, -4, 11 }, 
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
 				{ 20, -3, 11, 8, 8, 11, -3, 20 } };
 
 	boolean noMoves = false;
 	boolean gameOver = false;
-	int numTabs = 0;
 	int winValue;
 	int HUMAN;
 	int COMPUTER;
@@ -42,7 +44,6 @@ public class Game {
 					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
-					//System.out.println("No moves for *human*");
 				} else {
 					
 					noMoves = false;
@@ -57,7 +58,6 @@ public class Game {
 								cornerNode = nodes.get(i);
 							}
 					}
-					// printMoveValues();
 					
 					if (corner) {
 						n[0] = cornerNode.X;
@@ -72,22 +72,14 @@ public class Game {
 			} else {
 				// player 2 moves
 				ArrayList<Node> nodes = allNextMoves();
-				// printTable();
 				if (nodes.isEmpty()) {
 					turn++;
 					if (noMoves == true)
 						gameOver = true;
 					noMoves = true;
-					//System.out.println("No moves for *computer*");
 				} else {
 					noMoves = false;
-					// printMoveValues();
-					//int[] n = bestMove(nodes);
-					/*
-					for(int i = 0; i < numTabs; i++){
-						System.out.print(' ');
-					}
-					System.out.println("*computer* moves to: " + n[1] + ", " + n[0]);*/
+					
 					boolean corner = false;
 					Node cornerNode = null;
 					int[] n = new int[2];
@@ -99,7 +91,6 @@ public class Game {
 								cornerNode = nodes.get(i);
 							}
 					}
-					// printMoveValues();
 					
 					if (corner) {
 						n[0] = cornerNode.X;
@@ -112,11 +103,11 @@ public class Game {
 					turn++;
 				}
 			}
-			numTabs++;
+			shittyHeuristic();
 		}
-
+		
 		// count who won if the board is full
-		winValue = howMany(2) - howMany(1);
+		winValue = howMany(COMPUTER) - howMany(HUMAN);
 	}
 	
 	/*
@@ -127,12 +118,12 @@ public class Game {
 		int x = possMoves.get(0).X;
 		int y = possMoves.get(0).Y;
 		int frontiers = numOfEmptyAdj(turn%2+1);
-		int val = moveValues[y][x] - frontiers;
+		int val = moveValues[y][x]- frontiers;
 		// Need to make this "frontiers" value be calculated for each possible move
 		// so that number of frontier spaces are compared across different moves
 
 		for (int i = 1; i < possMoves.size(); i++) {
-			if (val < (moveValues[possMoves.get(i).Y][possMoves.get(i).X]) - frontiers) {
+			if (val < (moveValues[possMoves.get(i).Y][possMoves.get(i).X] - frontiers)) {
 				val = moveValues[possMoves.get(i).Y][possMoves.get(i).X] - frontiers;
 				x = possMoves.get(i).X;
 				y = possMoves.get(i).Y;
@@ -353,5 +344,24 @@ public class Game {
 					nextMoves.add(newNode);
 				}
 		return nextMoves;
+	}
+	
+	/*
+	 * shittyHeuristic - a rough, initial heuristic that simply prioritizes
+	 * corners > edges > inner rings
+	 */
+	public void shittyHeuristic() {
+		int[][] shit = 
+			{
+				{ 20, -3, 11, 8, 8, 11, -3, 20 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 11, -4, 2, 2, 2, 2, -4, 11 }, 
+				{ 8, 1, 2, -3, -3, 2, 1, 8 },
+				{ 8, 1, 2, -3, -3, 2, 1, 8 }, 
+				{ 11, -4, 2, 2, 2, 2, -4, 11 },
+				{ -3, -7, -4, 1, 1, -4, -7, -3 },
+				{ 20, -3, 11, 8, 8, 11, -3, 20 } 
+			};
+		moveValues = shit;
 	}
 }
