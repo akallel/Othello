@@ -35,6 +35,8 @@ public class Othello {
 	static int BLACK = 1;
 	static int WHITE = 2;
 
+	static int HUMANMOVE;
+	static int COMPUTERMOVE;
 	
 	/* main - runs the game.
 	 * 
@@ -42,11 +44,11 @@ public class Othello {
 	public Othello(int compColor, int time1, int time2, int depth) {
 		//which player will the computer be?
 		if(compColor == 1){
-			COMPUTER = 1;
-			HUMAN = 2;
+			COMPUTER = BLACK;
+			HUMAN = WHITE;
 		}else{
-			COMPUTER = 2;
-			COMPUTER = 1;
+			COMPUTER = WHITE;
+			HUMAN = BLACK;
 		}
 		//right now, our algorithm always works at a fixed depth
 		DEPTH = 2;
@@ -60,8 +62,8 @@ public class Othello {
 		printTable();
 		
 		//for checking whose move it is
-		int HUMANMOVE = HUMAN % 2;
-		int COMPUTERMOVE = COMPUTER % 2;
+		HUMANMOVE = HUMAN % 2;
+		COMPUTERMOVE = COMPUTER % 2;
 
 		//if gameOver is true, both players can't move and the game is over
 		while (!gameOver) { 
@@ -95,7 +97,7 @@ public class Othello {
 						a = "";
 						//print out the player's options
 						System.out.println("Your options for player "
-								+ (turn % 2 + 1) + " are: " + nodes.toString());
+								+ HUMAN + " are: " + nodes.toString());
 						System.out.println("choose coordinates a,b");
 						
 						//read in player input
@@ -113,7 +115,7 @@ public class Othello {
 					// once we've determined that the player has selected a
 					// valid move
 					// we change the tile
-					board[n1][n2] = 1;
+					board[n1][n2] = HUMAN;
 
 					// flip the resulting changed tiles
 					doFlip(turn, n1, n2);
@@ -204,8 +206,8 @@ public class Othello {
 					}
 
 					//print out the chosen computer move
-					System.out.println("Computer moves to: (" + n[0] + ","
-							+ n[1] + ")");
+					System.out.println("Computer moves to: (" + n[1] + ","
+							+ n[0] + ")");
 					
 					//change that spot to the computer tile value
 					board[n[0]][n[1]] = COMPUTER;
@@ -382,7 +384,7 @@ public class Othello {
 					Node newNode = new Node(i, j);
 					myPieces.add(newNode);
 				}
-		System.out.println("my pieces are at: "+myPieces);
+		//System.out.println("my pieces are at: "+myPieces);
 		return myPieces;
 	}
 
@@ -411,12 +413,12 @@ public class Othello {
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
@@ -462,12 +464,12 @@ public class Othello {
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
@@ -535,12 +537,12 @@ public class Othello {
 	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		boolean capture = false;
