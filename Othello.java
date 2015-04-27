@@ -106,7 +106,6 @@ public class Othello {
 						//print out the player's options
 						System.out.println("Your options for player "
 								+ HUMAN + " are: " + nodes.toString());
-						System.out.println("choose coordinates a,b");
 						
 						//read in player input
 						a = scan.nextLine();

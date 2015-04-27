@@ -17,37 +17,50 @@ public class Game3{
 			//generate move boards
 			ArrayList<Node> branches = allNextMoves(board);
 			Game3[] branchPlays = new Game3[branches.size()];
+			//for every possible move, create a new instance of Game3
 			for(int i = 0; i < branches.size(); i++){
 				branchPlays[i] = new Game3(move(branches.get(i), board), turn, noMoves, gameOver, depth - 1, HUMAN, COMPUTER);
+				//if the bestValue of the current game beats our running best value, replace it
 				if(branchPlays[i].bestValue < bestValue){
 					bestValue = branchPlays[i].bestValue;
 				}
+				//if the worstValue of the current game beats our running best value, replace it
 				if(branchPlays[i].worstValue > worstValue){
 					worstValue = branchPlays[i].worstValue;
 				}
+				//the winpercent of a Game3 that does not call Game instances is instead determined by the average of its game3 winpercents
 				winPercent += branchPlays[i].winPercent;
 			}
 			winPercent /= branches.size();
+			//if it's the computer's turn, we choose the best value for the computer
 			if(turn%2==COMPUTER % 2)
 				chosenValue = bestValue;
+			//and if it's the player's turn, we choose the best value for the player (most negative value
 			else 
 				chosenValue = worstValue;
 		} //if the depth is 0, we want to call Game on all of our children
 		else{
+			//create a Game for every single possible move
 			ArrayList<Node> branches = allNextMoves(board);
 			Game[] branchPlays = new Game[branches.size()];
 			int winCount = 0;
 			for(int i = 0; i < branches.size(); i++){
+				//create the game itself, which plays automatically
 				branchPlays[i] = new Game(move(branches.get(i), board), turn, noMoves, gameOver, HUMAN, COMPUTER);
+				//replace the worst value if we've found a worse value
 				if(branchPlays[i].winValue < worstValue)
 					worstValue = branchPlays[i].winValue;
+				//replace the best value if we've found a better value
 				if(branchPlays[i].winValue > bestValue)
 					bestValue = branchPlays[i].winValue;
+				//increase wincount if positive
 				if(branchPlays[i].winValue > 0)
 					winCount++;
 			}
+			//calculate percent wins
 			winPercent = (double)winCount / branches.size();
 			}
+			//choose a value based on the player turn
 			if(turn%2==COMPUTER % 2)
 				chosenValue = bestValue;
 			else 
