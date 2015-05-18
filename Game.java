@@ -65,7 +65,7 @@ public class Game {
 					} else {
 						n = bestMove(nodes);
 					}
-					board[n[0]][n[1]] = 1;
+					board[n[0]][n[1]] = HUMAN;
 					doFlip(turn, n[0], n[1]);
 					turn++;
 				}
@@ -98,7 +98,7 @@ public class Game {
 					} else {
 						n = bestMove(nodes);
 					}	
-					board[n[0]][n[1]] = 2;
+					board[n[0]][n[1]] = COMPUTER;
 					doFlip(turn, n[0], n[1]);
 					turn++;
 				}
@@ -252,12 +252,12 @@ public class Game {
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == COMPUTER % 2) {
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		}
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
@@ -286,12 +286,12 @@ public class Game {
 	public boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == COMPUTER % 2) {
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		}
 
 		boolean capture = false;

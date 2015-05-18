@@ -51,15 +51,22 @@ public class Othello {
 			HUMAN = BLACK;
 		}
 		//right now, our algorithm always works at a fixed depth
-		DEPTH = 0;
+		if(time1 >= 1000)
+			DEPTH = 1;
+		if(time1 >= 4000)
+			DEPTH = 2;
+		if(time1 >= 16000)
+			DEPTH = 2;
+		if(time1 >= 240000 || time1 == 0)
+			DEPTH = 4;
 		//but we still need a check to make sure our depth is less than the depth limit
-		if(DEPTH > depth)
+		if(DEPTH > depth && depth != 0)
 			DEPTH = depth;
 		
 		//create a scanner, initialize the board in the starting state, and print it out
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
-		printTable();
+		//printTable();
 		
 		//for checking whose move it is
 		HUMANMOVE = HUMAN % 2;
@@ -79,7 +86,7 @@ public class Othello {
 				//check if there's an available move for player 1
 				if (nodes.isEmpty()) {
 					//alert the player
-					System.out.println("NO MOVES AVAILABLE FOR USER.");
+					//System.out.println("pass");
 					//increment the turn
 					turn++;
 					//if noMoves is already true, the game is over because neither player can move
@@ -96,9 +103,8 @@ public class Othello {
 						//clear the string (in case we're restarting from a failed player move entry)
 						a = "";
 						//print out the player's options
-						System.out.println("Your options for player "
-								+ HUMAN + " are: " + nodes.toString());
-						System.out.println("choose coordinates a,b");
+						//System.out.println("Your options for player "
+						//		+ HUMAN + " are: " + nodes.toString());
 						
 						//read in player input
 						a = scan.nextLine();
@@ -124,7 +130,7 @@ public class Othello {
 					turn++;
 
 					// and print out the board state for the next player.
-					printTable();
+					//printTable();
 				}
 			} else {
 				// all our potential player 2 moves are stored within nodes
@@ -133,7 +139,7 @@ public class Othello {
 				// if player 2 has no moves
 				if (nodes.isEmpty()) {
 					// alert the player that player 2 can't move
-					System.out.println("NO MOVES AVAILABLE FOR COMPUTER.");
+					System.out.println("pass");
 					
 					//increment the turn
 					turn++;
@@ -188,14 +194,14 @@ public class Othello {
 						}
 
 						// store the leaf results in the leafResult integer array
-						int[] leafResults = new int[leaves.length];
+						double[] leafResults = new double[leaves.length];
 						
 						// miniMax stores our chosen leaf index within the leaf array
 						int miniMax = 0;
 						
 						// find the best value of our possible choices (mind you, these record their worst value - hence the minimax)
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = (int)leaves[i].chosenValue;
+							leafResults[i] = leaves[i].winPercent;
 							if(leafResults[i] > leafResults[miniMax])
 								miniMax = i;
 						}
@@ -206,8 +212,7 @@ public class Othello {
 					}
 
 					//print out the chosen computer move
-					System.out.println("Computer moves to: (" + n[1] + ","
-							+ n[0] + ")");
+					System.out.println(n[1] + " " + n[0]);
 					
 					//change that spot to the computer tile value
 					board[n[0]][n[1]] = COMPUTER;
@@ -216,7 +221,7 @@ public class Othello {
 					//increment the turn
 					turn++;
 					//print the resulting table
-					printTable();
+					//printTable();
 				}
 			}
 		}
@@ -501,10 +506,10 @@ public class Othello {
 			System.out.print(i + " | ");
 			for (int j = 0; j < board.length; j++) {
 				if (board[i][j] == 1){
-					System.out.print(board[i][j] + " ");
+					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
 				}
 				else if (board[i][j] == 2){
-					System.out.print(board[i][j] + " ");
+					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
 				}
 				else{
 					System.out.print(board[i][j] + " ");

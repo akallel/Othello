@@ -3,7 +3,7 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 /*java checks for nqueens : http://www.codeshare.io/KExMg*/
-public class main {
+public class Othello {
 	// color values (for prettiness!)
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
@@ -25,21 +25,52 @@ public class main {
 	static boolean gameOver = false;
 	
 	//the depth of our minimax/alpha-beta algorithm. The actual depth is DEPTH + 1, because of our treatment of leaf nodes.
-	static int DEPTH = 2;
+	static int DEPTH;
 	
 	//human and computer values
-	static int COMPUTER = 2;
-	static int HUMAN = 1;
+	static int COMPUTER;
+	static int HUMAN;
+	
+	//black is represented by a 1 (for player 1), white is represented by a 2 (for player 2)
+	static int BLACK = 1;
+	static int WHITE = 2;
 
+	static int HUMANMOVE;
+	static int COMPUTERMOVE;
 	
 	/* main - runs the game.
 	 * 
 	 */
-	public static void main(String[] args) {
+	public Othello(int compColor, int time1, int time2, int depth) {
+		//which player will the computer be?
+		if(compColor == 1){
+			COMPUTER = BLACK;
+			HUMAN = WHITE;
+		}else{
+			COMPUTER = WHITE;
+			HUMAN = BLACK;
+		}
+		//right now, our algorithm always works at a fixed depth
+		if(time1 >= 1000)
+			DEPTH = 1;
+		if(time1 >= 4000)
+			DEPTH = 2;
+		if(time1 >= 16000)
+			DEPTH = 2;
+		if(time1 >= 240000 || time1 == 0)
+			DEPTH = 4;
+		//but we still need a check to make sure our depth is less than the depth limit
+		if(DEPTH > depth && depth != 0)
+			DEPTH = depth;
+		
 		//create a scanner, initialize the board in the starting state, and print it out
 		Scanner scan = new Scanner(System.in);
 		initializeTable(board);
-		printTable();
+		//printTable();
+		
+		//for checking whose move it is
+		HUMANMOVE = HUMAN % 2;
+		COMPUTERMOVE = COMPUTER % 2;
 
 		//if gameOver is true, both players can't move and the game is over
 		while (!gameOver) { 
@@ -48,14 +79,14 @@ public class main {
 			int n1 = 0, n2 = 0;
 
 			//check  whose turn it is
-			if (turn % 2 == 0) {
+			if (turn % 2 == HUMANMOVE) {
 				// player 1 moves
 				ArrayList<Node> nodes = allNextMoves();
 				
 				//check if there's an available move for player 1
 				if (nodes.isEmpty()) {
 					//alert the player
-					System.out.println("NO MOVES AVAILABLE FOR USER.");
+					System.out.println("pass");
 					//increment the turn
 					turn++;
 					//if noMoves is already true, the game is over because neither player can move
@@ -72,26 +103,25 @@ public class main {
 						//clear the string (in case we're restarting from a failed player move entry)
 						a = "";
 						//print out the player's options
-						System.out.println("Your options for player "
-								+ (turn % 2 + 1) + " are: " + nodes.toString());
-						System.out.println("choose coordinates a,b");
+						//System.out.println("Your options for player "
+						//		+ HUMAN + " are: " + nodes.toString());
 						
 						//read in player input
-						a = scan.next();
+						a = scan.nextLine();
 						
 						// check if the input string is the correct format
-						if (a.matches("^[0-9]+(,[0-9]+)")) {
-							String[] aa = a.split(",");
+						if (a.matches("^[0-9]+ ([0-9]+)")) {
+							String[] aa = a.split("\\s");
 							//parse the input string into two integers for movement
-							n2 = Integer.parseInt(aa[0]);
 							n1 = Integer.parseInt(aa[1]);
+							n2 = Integer.parseInt(aa[0]);
 						}
 					} while (!validMove(n1, n2, nodes));
 
 					// once we've determined that the player has selected a
 					// valid move
 					// we change the tile
-					board[n1][n2] = 1;
+					board[n1][n2] = HUMAN;
 
 					// flip the resulting changed tiles
 					doFlip(turn, n1, n2);
@@ -100,7 +130,7 @@ public class main {
 					turn++;
 
 					// and print out the board state for the next player.
-					printTable();
+					//printTable();
 				}
 			} else {
 				// all our potential player 2 moves are stored within nodes
@@ -109,7 +139,7 @@ public class main {
 				// if player 2 has no moves
 				if (nodes.isEmpty()) {
 					// alert the player that player 2 can't move
-					System.out.println("NO MOVES AVAILABLE FOR COMPUTER.");
+					//System.out.println("NO MOVES AVAILABLE FOR COMPUTER.");
 					
 					//increment the turn
 					turn++;
@@ -160,18 +190,18 @@ public class main {
 						for (int i = 0; i < leaves.length; i++) {
 							//Game3 will branch to the designated depth (+ 1) and evaluate the worst value in each branch
 							leaves[i] = new Game3(move(nodes.get(i)), turn + 1,
-									noMoves, gameOver, DEPTH);
+									noMoves, gameOver, DEPTH, HUMAN, COMPUTER);
 						}
 
 						// store the leaf results in the leafResult integer array
-						int[] leafResults = new int[leaves.length];
+						double[] leafResults = new double[leaves.length];
 						
 						// miniMax stores our chosen leaf index within the leaf array
 						int miniMax = 0;
 						
 						// find the best value of our possible choices (mind you, these record their worst value - hence the minimax)
 						for (int i = 0; i < leaves.length; i++) {
-							leafResults[i] = leaves[i].chosenValue;
+							leafResults[i] = leaves[i].winPercent;
 							if(leafResults[i] > leafResults[miniMax])
 								miniMax = i;
 						}
@@ -182,17 +212,16 @@ public class main {
 					}
 
 					//print out the chosen computer move
-					System.out.println("Computer moves to: (" + n[1] + ","
-							+ n[0] + ")");
+					System.out.println(n[1] + " " + n[0]);
 					
 					//change that spot to the computer tile value
-					board[n[0]][n[1]] = 2;
+					board[n[0]][n[1]] = COMPUTER;
 					//execute a flip of adjacent tiles as per Othello rules
 					doFlip(turn, n[0], n[1]);
 					//increment the turn
 					turn++;
 					//print the resulting table
-					printTable();
+					//printTable();
 				}
 			}
 		}
@@ -238,25 +267,6 @@ public class main {
 		
 		// return the deep copy, one move further into the game
 		return newBoard;
-	}
-
-	/*
-	 * bestMove - traverses the 2D array, recording the coordinates of the best
-	 * valued position
-	 */
-	private static int bestMove(int[] leafResults) {
-		// temporaray storage for the index of the best move
-		int index = 0;
-		
-		// traverse the array of results, saving the index of the largest in index
-		for (int i = 1; i < leafResults.length; i++) {
-			if (leafResults[i] > leafResults[index]) {
-				index = i;
-			}
-		}
-		
-		//return index
-		return index;
 	}
 
 	/*
@@ -368,7 +378,6 @@ public class main {
 		return a;
 	}
 
-
 	/* whereAreMyPieces - returns the coordinates of a player's pieces
 	 * 
 	 */
@@ -380,7 +389,7 @@ public class main {
 					Node newNode = new Node(i, j);
 					myPieces.add(newNode);
 				}
-		System.out.println("my pieces are at: "+myPieces);
+		//System.out.println("my pieces are at: "+myPieces);
 		return myPieces;
 	}
 
@@ -409,12 +418,12 @@ public class main {
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
@@ -460,12 +469,12 @@ public class main {
 		boolean flipThis = false;
 
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		if (currentx + dirx < 8 && currentx + dirx >= 0 && currenty + diry < 8
@@ -497,10 +506,10 @@ public class main {
 			System.out.print(i + " | ");
 			for (int j = 0; j < board.length; j++) {
 				if (board[i][j] == 1){
-					System.out.print(board[i][j] + " ");
+					System.out.print(ANSI_RED + board[i][j] + " " + ANSI_RESET);
 				}
 				else if (board[i][j] == 2){
-					System.out.print(board[i][j] + " ");
+					System.out.print(ANSI_BLACK + board[i][j] + " " + ANSI_RESET);
 				}
 				else{
 					System.out.print(board[i][j] + " ");
@@ -510,33 +519,9 @@ public class main {
 		}
 		numOfEmptyAdj(turn%2+1);
 	}
-
-	/* printTable - Weeeee printing a table as input for table Copies
-	 * 2D arrays... but oh well. "Memory is cheap" - Ted
+	
+	/* initializeTable - creates the initial playing board
 	 * 
-	 */
-	private static void printTable(int[][] tempBoard) {
-		for (int i = 0; i < tempBoard.length; i++) {
-			if (i == 0)
-				System.out.println("    0 1 2 3 4 5 6 7\n   ----------------");
-			System.out.print(i + " | ");
-			for (int j = 0; j < tempBoard.length; j++) {
-				if (tempBoard[i][j] == 1){
-					System.out.print(tempBoard[i][j] + " ");
-				}
-				else if (tempBoard[i][j] == 2){
-					System.out.print(tempBoard[i][j] + " ");
-				}
-				else{
-					System.out.print(tempBoard[i][j] + " ");
-				}
-			}
-			System.out.println();
-		}
-	}
-
-	/*
-	 * initializeTable - creates the initial playing board
 	 */
 	public static void initializeTable(int[][] a) {
 		for (int i = 0; i < a.length; i++)
@@ -549,20 +534,20 @@ public class main {
 		a[4][3] = 2;
 	}
 
-	/*
-	 * CanFlip - moves out in a given direction from an empty tile to identify
+	/* CanFlip - moves out in a given direction from an empty tile to identify
 	 * if that tile represents a valid move for the team moving on the current
 	 * turn. dirX, dirY should be {-1, 0, 1}, but should never BOTH be zero.
+	 * 
 	 */
 	public static boolean CanFlip(int X, int Y, int dirX, int dirY) {
 		int player, oppositePlayer;
 		// define who attacking and defending players are based on turn
-		if (turn % 2 == 0) {
-			player = 1;
-			oppositePlayer = 2;
+		if (turn % 2 == HUMANMOVE) {
+			player = HUMAN;
+			oppositePlayer = COMPUTER;
 		} else {
-			player = 2;
-			oppositePlayer = 1;
+			player = COMPUTER;
+			oppositePlayer = HUMAN;
 		}
 
 		boolean capture = false;
@@ -645,26 +630,6 @@ public class main {
 			for (int j = 0; j < moveValues[i].length; j++) {
 				moveValues[i][j] = 0;
 			}
-		}
-	}
-
-	/*
-	 * printMoveValues - prints out the 2D array of move values
-	 */
-	private static void printMoveValues() {
-		for (int i = 0; i < moveValues.length; i++) {
-			if (i == 0)
-				System.out.println("   0 1 2 3 4 5 6 7\n   ---------------");
-			System.out.print(i + " | ");
-			for (int j = 0; j < moveValues.length; j++) {
-				if (moveValues[i][j] == 1)
-					System.out.print(moveValues[i][j] + " ");
-				else if (moveValues[i][j] == 2)
-					System.out.print(moveValues[i][j] + " ");
-				else
-					System.out.print(moveValues[i][j] + " ");
-			}
-			System.out.println();
 		}
 	}
 }
